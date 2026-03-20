@@ -65,6 +65,13 @@ export default function BookingModal({ service, onClose }) {
       toast.error('Please describe your requirements')
       return
     }
+
+    const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID
+    if (!razorpayKey || razorpayKey === 'your_razorpay_key_id') {
+      toast.error('Payment not configured. Contact support.')
+      return
+    }
+
     setLoading(true)
 
     const loaded = await loadRazorpay()
@@ -75,7 +82,7 @@ export default function BookingModal({ service, onClose }) {
     }
 
     const options = {
-      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+      key: razorpayKey,
       amount: advanceAmount * 100,
       currency: 'INR',
       name: 'ASLEN TECH SOLUTIONS',
