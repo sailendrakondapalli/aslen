@@ -3,13 +3,13 @@ import { supabase } from '../lib/supabase'
 
 export const useAuthStore = create((set) => ({
   user: null,
-  loading: false, // start false so UI always renders
+  loading: true, // true until session is resolved
 
   signInWithGoogle: async () => {
     if (!supabase) throw new Error('Supabase not configured')
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/dashboard` },
+      options: { redirectTo: `${window.location.origin}/dashboard`, skipBrowserRedirect: false },
     })
     if (error) throw error
   },
@@ -20,25 +20,24 @@ export const useAuthStore = create((set) => ({
   },
 
   initialize: () => {
-    if (!supabase) return
+    if (!supabase) {
+      set({ loading: false })
+      return
+    }
 
-    // Get current session without blocking render
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // onAuthStateChange fires immediately with the current session,
+    // including when Google redirects back with a token in the URL.
+    // This is the single source of truth — no need for getSession separately.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
-        set({ user: session.user })
-        syncUserToDb(session.user)
-      }
-    }).catch(() => {})
-
-    // Listen for auth changes
-    supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        set({ user: session.user })
+        set({ user: session.user, loading: false })
         syncUserToDb(session.user)
       } else {
-        set({ user: null })
+        set({ user: null, loading: false })
       }
     })
+
+    return () => subscription.unsubscribe()
   },
 }))
 
