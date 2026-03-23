@@ -1,9 +1,10 @@
 -- ============================================
 -- ASLEN TECH SOLUTIONS - Supabase Setup SQL
--- Run this in your Supabase SQL Editor
+-- Safe to run multiple times (idempotent)
 -- ============================================
 
--- Users table
+-- ── Tables ──────────────────────────────────────────────────────────────────
+
 create table if not exists public.users (
   id uuid primary key references auth.users(id) on delete cascade,
   name text,
@@ -12,7 +13,6 @@ create table if not exists public.users (
   created_at timestamptz default now()
 );
 
--- Bookings table
 create table if not exists public.bookings (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references public.users(id) on delete cascade,
@@ -21,15 +21,16 @@ create table if not exists public.bookings (
   service_title text,
   package_name text,
   payment_id text,
+  payment_method text default 'upi',
+  payment_screenshot_url text,
   advance_paid numeric default 0,
   total_amount numeric default 0,
   extra_pages integer default 0,
   description text,
-  status text default 'confirmed',
+  status text default 'pending_verification',
   created_at timestamptz default now()
 );
 
--- Contacts table
 create table if not exists public.contacts (
   id uuid primary key default gen_random_uuid(),
   name text,
@@ -38,15 +39,39 @@ create table if not exists public.contacts (
   created_at timestamptz default now()
 );
 
--- ============================================
--- Row Level Security (RLS)
--- ============================================
+-- ── Migrations (safe if columns already exist) ───────────────────────────────
+
+alter table public.bookings add column if not exists payment_method text default 'upi';
+alter table public.bookings add column if not exists payment_screenshot_url text;
+alter table public.bookings add column if not exists user_email text;
+
+-- ── Enable RLS ───────────────────────────────────────────────────────────────
 
 alter table public.users enable row level security;
 alter table public.bookings enable row level security;
 alter table public.contacts enable row level security;
 
--- Users policies
+-- ── Drop old policies before recreating (avoids "already exists" errors) ─────
+
+drop policy if exists "Users can view own profile" on public.users;
+drop policy if exists "Users can upsert own profile" on public.users;
+drop policy if exists "Users can update own profile" on public.users;
+drop policy if exists "Admins can view all users" on public.users;
+
+drop policy if exists "Users can view own bookings" on public.bookings;
+drop policy if exists "Users can insert own bookings" on public.bookings;
+drop policy if exists "Admins can view all bookings" on public.bookings;
+drop policy if exists "Admins can update all bookings" on public.bookings;
+
+drop policy if exists "Anyone can submit contact" on public.contacts;
+drop policy if exists "Admins can view contacts" on public.contacts;
+
+drop policy if exists "Users can upload payment screenshots" on storage.objects;
+drop policy if exists "Users can view own screenshots" on storage.objects;
+drop policy if exists "Admins can view all screenshots" on storage.objects;
+
+-- ── Users policies ───────────────────────────────────────────────────────────
+
 create policy "Users can view own profile"
   on public.users for select using (auth.uid() = id);
 
@@ -56,14 +81,12 @@ create policy "Users can upsert own profile"
 create policy "Users can update own profile"
   on public.users for update using (auth.uid() = id);
 
--- Admin can view all users
 create policy "Admins can view all users"
   on public.users for select
-  using (
-    auth.jwt() ->> 'email' in ('sailendrakondapalli@gmail.com', 'adduriaswani@gmail.com')
-  );
+  using (auth.jwt() ->> 'email' in ('sailendrakondapalli@gmail.com', 'adduriaswani@gmail.com'));
 
--- Bookings: users see own, admins see all
+-- ── Bookings policies ────────────────────────────────────────────────────────
+
 create policy "Users can view own bookings"
   on public.bookings for select using (auth.uid() = user_id);
 
@@ -72,22 +95,42 @@ create policy "Users can insert own bookings"
 
 create policy "Admins can view all bookings"
   on public.bookings for select
-  using (
-    auth.jwt() ->> 'email' in ('sailendrakondapalli@gmail.com', 'adduriaswani@gmail.com')
-  );
+  using (auth.jwt() ->> 'email' in ('sailendrakondapalli@gmail.com', 'adduriaswani@gmail.com'));
 
 create policy "Admins can update all bookings"
   on public.bookings for update
-  using (
-    auth.jwt() ->> 'email' in ('sailendrakondapalli@gmail.com', 'adduriaswani@gmail.com')
-  );
+  using (auth.jwt() ->> 'email' in ('sailendrakondapalli@gmail.com', 'adduriaswani@gmail.com'));
 
--- Contacts: anyone can insert
+-- ── Contacts policies ────────────────────────────────────────────────────────
+
 create policy "Anyone can submit contact"
   on public.contacts for insert with check (true);
 
 create policy "Admins can view contacts"
   on public.contacts for select
+  using (auth.jwt() ->> 'email' in ('sailendrakondapalli@gmail.com', 'adduriaswani@gmail.com'));
+
+-- ── Storage policies (run AFTER creating bucket "payment-screenshots") ────────
+-- Create the bucket manually in Supabase Dashboard → Storage → New bucket
+-- Name: payment-screenshots, Public: OFF
+
+create policy "Users can upload payment screenshots"
+  on storage.objects for insert
+  with check (
+    bucket_id = 'payment-screenshots'
+    and auth.role() = 'authenticated'
+  );
+
+create policy "Users can view own screenshots"
+  on storage.objects for select
   using (
-    auth.jwt() ->> 'email' in ('sailendrakondapalli@gmail.com', 'adduriaswani@gmail.com')
+    bucket_id = 'payment-screenshots'
+    and auth.uid()::text = (storage.foldername(name))[1]
+  );
+
+create policy "Admins can view all screenshots"
+  on storage.objects for select
+  using (
+    bucket_id = 'payment-screenshots'
+    and auth.jwt() ->> 'email' in ('sailendrakondapalli@gmail.com', 'adduriaswani@gmail.com')
   );

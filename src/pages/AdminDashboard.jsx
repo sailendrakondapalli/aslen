@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { supabase } from '../lib/supabase'
 import { ADMIN_EMAILS } from '../data/services'
-import { Loader2, CheckCircle, Clock, XCircle, IndianRupee, Users, ShoppingBag } from 'lucide-react'
+import { Loader2, Clock, IndianRupee, Users, ShoppingBag, Image, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const STATUS_OPTIONS = ['confirmed', 'in_progress', 'completed', 'cancelled']
@@ -22,6 +22,7 @@ export default function AdminDashboard() {
   const [clients, setClients] = useState([])
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState('bookings')
+  const [lightboxUrl, setLightboxUrl] = useState(null)
 
   const isAdmin = user && ADMIN_EMAILS.includes(user.email)
 
@@ -66,7 +67,6 @@ export default function AdminDashboard() {
   const totalRevenue = bookings.filter(b => b.status !== 'cancelled').reduce((s, b) => s + (b.advance_paid || 0), 0)
   const pendingRevenue = bookings.filter(b => b.status !== 'cancelled' && b.status !== 'completed')
     .reduce((s, b) => s + ((b.total_amount || 0) - (b.advance_paid || 0)), 0)
-  const completed = bookings.filter(b => b.status === 'completed').length
 
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
@@ -121,7 +121,7 @@ export default function AdminDashboard() {
                 <table className="w-full text-sm">
                   <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
                     <tr>
-                      {['Client', 'Service', 'Package', 'Advance', 'Total', 'Pending', 'Status', 'Date', 'Payment ID'].map(h => (
+                      {['Client', 'Service', 'Package', 'Advance', 'Total', 'Pending', 'Status', 'Screenshot', 'Date'].map(h => (
                         <th key={h} className="px-4 py-3 text-left font-semibold whitespace-nowrap">{h}</th>
                       ))}
                     </tr>
@@ -148,11 +148,20 @@ export default function AdminDashboard() {
                             ))}
                           </select>
                         </td>
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          {b.payment_screenshot_url ? (
+                            <button
+                              onClick={() => setLightboxUrl(b.payment_screenshot_url)}
+                              className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 font-medium"
+                            >
+                              <Image size={14} /> View
+                            </button>
+                          ) : (
+                            <span className="text-gray-400 text-xs">—</span>
+                          )}
+                        </td>
                         <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
                           {new Date(b.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: '2-digit' })}
-                        </td>
-                        <td className="px-4 py-3 text-gray-400 font-mono text-xs whitespace-nowrap">
-                          {b.payment_id ? b.payment_id.slice(0, 14) + '...' : '—'}
                         </td>
                       </tr>
                     ))}
@@ -199,6 +208,29 @@ export default function AdminDashboard() {
           </div>
         )}
       </div>
+
+      {/* Screenshot Lightbox */}
+      {lightboxUrl && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
+          onClick={() => setLightboxUrl(null)}
+        >
+          <div className="relative max-w-lg w-full" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setLightboxUrl(null)}
+              className="absolute -top-10 right-0 text-white hover:text-gray-300 transition-colors"
+            >
+              <X size={28} />
+            </button>
+            <img
+              src={lightboxUrl}
+              alt="Payment Screenshot"
+              className="w-full rounded-2xl shadow-2xl object-contain max-h-[80vh]"
+            />
+            <p className="text-center text-white text-sm mt-3 opacity-70">Payment Screenshot</p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
