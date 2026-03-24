@@ -7,9 +7,7 @@ const getCachedUser = () => {
   try {
     const raw = localStorage.getItem(USER_CACHE_KEY)
     return raw ? JSON.parse(raw) : null
-  } catch {
-    return null
-  }
+  } catch { return null }
 }
 
 const setCachedUser = (user) => {
@@ -19,9 +17,9 @@ const setCachedUser = (user) => {
   } catch {}
 }
 
-export const useAuthStore = create((set) => ({
+export const useAuthStore = create((set, get) => ({
   user: getCachedUser(),
-  loading: true,
+  loading: !getCachedUser(), // skip loading spinner if we have cached user
 
   signInWithGoogle: async () => {
     if (!supabase) throw new Error('Supabase not configured')
@@ -38,46 +36,42 @@ export const useAuthStore = create((set) => ({
   signOut: async () => {
     if (supabase) await supabase.auth.signOut()
     setCachedUser(null)
-    set({ user: null })
+    set({ user: null, loading: false })
   },
 
-  initialize: () => {
+  initialize: (navigate) => {
     if (!supabase) {
       set({ loading: false })
       return
     }
 
-    // Resolve session immediately on load
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      const user = session?.user ?? null
-      setCachedUser(user)
-      set({ user, loading: false })
-      if (user) syncUserToDb(user)
-    })
-
-    // Listen for ALL auth events
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       const user = session?.user ?? null
       setCachedUser(user)
       set({ user, loading: false })
       if (user) syncUserToDb(user)
 
-      // After Google OAuth redirect, Supabase fires SIGNED_IN
-      // Force a hard reload so the app re-hydrates cleanly with the new session
-      if (event === 'SIGNED_IN') {
-        // Small delay to let Supabase finish writing the session to localStorage
-        setTimeout(() => {
-          // Only reload if we're on the callback/dashboard route (not already reloaded)
-          if (!window.__aslen_auth_reloaded) {
-            window.__aslen_auth_reloaded = true
-            window.location.replace('/dashboard')
-          }
-        }, 100)
+      // On fresh OAuth login, redirect to dashboard
+      if (event === 'SIGNED_IN' && navigate) {
+        const isOAuthCallback = window.location.hash.includes('access_token') ||
+          window.location.search.includes('code=')
+        if (isOAuthCallback) {
+          navigate('/dashboard', { replace: true })
+        }
       }
+    })
 
-      if (event === 'SIGNED_OUT') {
-        window.__aslen_auth_reloaded = false
+    // Also resolve session on load for non-OAuth page loads
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      const user = session?.user ?? null
+      // Only update if different from cache to avoid flicker
+      if (JSON.stringify(user) !== JSON.stringify(get().user)) {
+        setCachedUser(user)
+        set({ user, loading: false })
+      } else {
+        set({ loading: false })
       }
+      if (user) syncUserToDb(user)
     })
 
     return () => subscription.unsubscribe()
