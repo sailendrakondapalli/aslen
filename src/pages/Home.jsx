@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { ArrowRight, CheckCircle, Users, Award, Zap, Loader2 } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { ArrowRight, CheckCircle, Users, Award, Zap, Loader2, Star, MessageSquare } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import ServiceCard from '../components/ServiceCard'
 import { services } from '../data/services'
@@ -8,6 +9,13 @@ import toast from 'react-hot-toast'
 export default function Home() {
   const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' })
   const [submitting, setSubmitting] = useState(false)
+  const [reviews, setReviews] = useState([])
+
+  useEffect(() => {
+    if (!supabase) return
+    supabase.from('feedback').select('*').order('created_at', { ascending: false }).limit(6)
+      .then(({ data }) => setReviews(data || []))
+  }, [])
 
   const handleContact = async (e) => {
     e.preventDefault()
@@ -128,6 +136,57 @@ export default function Home() {
               ))}
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Reviews / Feedback */}
+      <section id="reviews" className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-black text-gray-900 mb-3">What Our Clients Say</h2>
+            <p className="text-gray-500 text-lg">Real feedback from real clients</p>
+          </div>
+
+          {reviews.length === 0 ? (
+            <div className="text-center py-10">
+              <MessageSquare size={40} className="mx-auto text-gray-200 mb-3" />
+              <p className="text-gray-400 mb-4">No reviews yet — be the first!</p>
+              <Link to="/feedback" className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity">
+                <Star size={16} /> Write a Review
+              </Link>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+                {reviews.map((r) => (
+                  <div key={r.id} className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm flex flex-col gap-3">
+                    <div className="flex items-center gap-1">
+                      {[1,2,3,4,5].map(s => (
+                        <Star key={s} size={16} className={s <= r.rating ? 'fill-yellow-400 text-yellow-400' : 'fill-gray-200 text-gray-200'} />
+                      ))}
+                    </div>
+                    <p className="text-gray-700 text-sm leading-relaxed flex-1">"{r.comment}"</p>
+                    <div className="flex items-center gap-2 pt-2 border-t border-gray-50">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-xs shrink-0">
+                        {r.name?.charAt(0)?.toUpperCase() || 'U'}
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900">{r.name || 'Anonymous'}</p>
+                        <p className="text-xs text-gray-400">
+                          {new Date(r.created_at).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="text-center">
+                <Link to="/feedback" className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity">
+                  <Star size={16} /> Share Your Experience
+                </Link>
+              </div>
+            </>
+          )}
         </div>
       </section>
 
