@@ -3,7 +3,6 @@ import { supabase } from '../lib/supabase'
 
 const USER_CACHE_KEY = 'aslen_user'
 
-// Read cached user from localStorage for instant UI on page load
 const getCachedUser = () => {
   try {
     const raw = localStorage.getItem(USER_CACHE_KEY)
@@ -21,7 +20,6 @@ const setCachedUser = (user) => {
 }
 
 export const useAuthStore = create((set) => ({
-  // Hydrate from cache instantly — no flicker, no spinner delay
   user: getCachedUser(),
   loading: true,
 
@@ -49,7 +47,7 @@ export const useAuthStore = create((set) => ({
       return
     }
 
-    // Resolve session immediately and update cache
+    // Resolve session immediately on load
     supabase.auth.getSession().then(({ data: { session } }) => {
       const user = session?.user ?? null
       setCachedUser(user)
@@ -57,12 +55,29 @@ export const useAuthStore = create((set) => ({
       if (user) syncUserToDb(user)
     })
 
-    // Listen for auth changes (login redirect, logout, token refresh)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    // Listen for ALL auth events
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       const user = session?.user ?? null
       setCachedUser(user)
       set({ user, loading: false })
       if (user) syncUserToDb(user)
+
+      // After Google OAuth redirect, Supabase fires SIGNED_IN
+      // Force a hard reload so the app re-hydrates cleanly with the new session
+      if (event === 'SIGNED_IN') {
+        // Small delay to let Supabase finish writing the session to localStorage
+        setTimeout(() => {
+          // Only reload if we're on the callback/dashboard route (not already reloaded)
+          if (!window.__aslen_auth_reloaded) {
+            window.__aslen_auth_reloaded = true
+            window.location.replace('/dashboard')
+          }
+        }, 100)
+      }
+
+      if (event === 'SIGNED_OUT') {
+        window.__aslen_auth_reloaded = false
+      }
     })
 
     return () => subscription.unsubscribe()
