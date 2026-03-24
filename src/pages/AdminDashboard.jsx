@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { supabase } from '../lib/supabase'
 import { ADMIN_EMAILS } from '../data/services'
-import { Loader2, Clock, IndianRupee, Users, ShoppingBag, Image, X } from 'lucide-react'
+import { Loader2, Clock, IndianRupee, Users, ShoppingBag, Image, X, Star } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const STATUS_OPTIONS = ['confirmed', 'in_progress', 'completed', 'cancelled']
@@ -20,6 +20,7 @@ export default function AdminDashboard() {
   const navigate = useNavigate()
   const [bookings, setBookings] = useState([])
   const [clients, setClients] = useState([])
+  const [feedbacks, setFeedbacks] = useState([])
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState('bookings')
   const [lightboxUrl, setLightboxUrl] = useState(null)
@@ -38,12 +39,14 @@ export default function AdminDashboard() {
 
   const fetchAll = async () => {
     setLoading(true)
-    const [{ data: b }, { data: u }] = await Promise.all([
+    const [{ data: b }, { data: u }, { data: f }] = await Promise.all([
       supabase.from('bookings').select('*').order('created_at', { ascending: false }),
       supabase.from('users').select('*').order('created_at', { ascending: false }),
+      supabase.from('feedback').select('*').order('created_at', { ascending: false }),
     ])
     setBookings(b || [])
     setClients(u || [])
+    setFeedbacks(f || [])
     setLoading(false)
   }
 
@@ -94,7 +97,7 @@ export default function AdminDashboard() {
 
         {/* Tabs */}
         <div className="flex gap-2 mb-6">
-          {['bookings', 'clients'].map((t) => (
+          {['bookings', 'clients', 'feedback'].map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -208,6 +211,47 @@ export default function AdminDashboard() {
           </div>
         )}
       </div>
+
+        {/* Feedback Tab */}
+        {tab === 'feedback' && (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+              <h2 className="font-bold text-gray-900 text-lg">All Feedback ({feedbacks.length})</h2>
+              <button onClick={fetchAll} className="text-sm text-blue-600 hover:underline">Refresh</button>
+            </div>
+            {feedbacks.length === 0 ? (
+              <div className="text-center py-16 text-gray-400">No feedback yet</div>
+            ) : (
+              <div className="divide-y divide-gray-50">
+                {feedbacks.map((f) => (
+                  <div key={f.id} className="p-4 hover:bg-gray-50 transition-colors">
+                    <div className="flex items-center justify-between gap-3 mb-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-xs shrink-0">
+                          {f.name?.charAt(0)?.toUpperCase() || 'U'}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-900 text-sm">{f.name || 'Anonymous'}</p>
+                          <p className="text-xs text-gray-400">{f.user_email || '—'}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        {[1,2,3,4,5].map(s => (
+                          <Star key={s} size={14} className={s <= f.rating ? 'fill-yellow-400 text-yellow-400' : 'fill-gray-200 text-gray-200'} />
+                        ))}
+                        <span className="text-xs text-gray-500 ml-1">{f.rating}/5</span>
+                      </div>
+                    </div>
+                    <p className="text-sm text-gray-700 ml-10">{f.comment}</p>
+                    <p className="text-xs text-gray-400 ml-10 mt-1">
+                      {new Date(f.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
       {/* Screenshot Lightbox */}
       {lightboxUrl && (

@@ -10,6 +10,7 @@ import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import ServiceDetail from './pages/ServiceDetail'
 import AdminDashboard from './pages/AdminDashboard'
+import Feedback from './pages/Feedback'
 
 // Inner component so useNavigate works inside BrowserRouter
 function AppInner() {
@@ -31,6 +32,7 @@ function AppInner() {
         <Route path="/services/:id" element={<><ServiceDetail /><Footer /></>} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+        <Route path="/feedback" element={<><Feedback /><Footer /></>} />
       </Routes>
     </>
   )

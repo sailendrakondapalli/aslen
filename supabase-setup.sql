@@ -39,6 +39,16 @@ create table if not exists public.contacts (
   created_at timestamptz default now()
 );
 
+create table if not exists public.feedback (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references public.users(id) on delete set null,
+  user_email text,
+  name text,
+  rating integer check (rating >= 1 and rating <= 5),
+  comment text,
+  created_at timestamptz default now()
+);
+
 -- ── Migrations (safe if columns already exist) ───────────────────────────────
 
 alter table public.bookings add column if not exists payment_method text default 'upi';
@@ -50,6 +60,7 @@ alter table public.bookings add column if not exists user_email text;
 alter table public.users enable row level security;
 alter table public.bookings enable row level security;
 alter table public.contacts enable row level security;
+alter table public.feedback enable row level security;
 
 -- ── Drop old policies before recreating (avoids "already exists" errors) ─────
 
@@ -65,6 +76,10 @@ drop policy if exists "Admins can update all bookings" on public.bookings;
 
 drop policy if exists "Anyone can submit contact" on public.contacts;
 drop policy if exists "Admins can view contacts" on public.contacts;
+
+drop policy if exists "Anyone can submit feedback" on public.feedback;
+drop policy if exists "Anyone can view feedback" on public.feedback;
+drop policy if exists "Admins can delete feedback" on public.feedback;
 
 drop policy if exists "Users can upload payment screenshots" on storage.objects;
 drop policy if exists "Users can view own screenshots" on storage.objects;
@@ -108,6 +123,18 @@ create policy "Anyone can submit contact"
 
 create policy "Admins can view contacts"
   on public.contacts for select
+  using (auth.jwt() ->> 'email' in ('sailendrakondapalli@gmail.com', 'adduriaswani@gmail.com'));
+
+-- ── Feedback policies ────────────────────────────────────────────────────────
+
+create policy "Anyone can submit feedback"
+  on public.feedback for insert with check (true);
+
+create policy "Anyone can view feedback"
+  on public.feedback for select using (true);
+
+create policy "Admins can delete feedback"
+  on public.feedback for delete
   using (auth.jwt() ->> 'email' in ('sailendrakondapalli@gmail.com', 'adduriaswani@gmail.com'));
 
 -- ── Storage policies (run AFTER creating bucket "payment-screenshots") ────────
