@@ -42,13 +42,13 @@ export default function Home() {
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <section id="home" className="min-h-screen flex items-center relative overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, #1a0000 0%, #7f1d1d 40%, #b91c1c 100%)' }}>
+        style={{ background: 'linear-gradient(135deg, #0a0f2e 0%, #0d1442 40%, #1a2980 100%)' }}>
         {/* Decorative blobs */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute top-20 left-10 w-80 h-80 rounded-full blur-3xl opacity-20"
-            style={{ background: 'radial-gradient(circle, #ef4444, transparent)' }} />
+            style={{ background: 'radial-gradient(circle, #3b82f6, transparent)' }} />
           <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full blur-3xl opacity-15"
-            style={{ background: 'radial-gradient(circle, #dc2626, transparent)' }} />
+            style={{ background: 'radial-gradient(circle, #1d4ed8, transparent)' }} />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-3xl opacity-10"
             style={{ background: 'radial-gradient(circle, #f59e0b, transparent)' }} />
         </div>
@@ -63,7 +63,7 @@ export default function Home() {
 
             <h1 className="reveal reveal-delay-1 text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-tight mb-4">
               ASLEN<br />
-              <span style={{ background: 'linear-gradient(90deg, #fca5a5, #fbbf24)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              <span style={{ background: 'linear-gradient(90deg, #60a5fa, #a78bfa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                 TECH SOLUTIONS
               </span>
             </h1>
@@ -100,7 +100,7 @@ export default function Home() {
       <section id="services" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="reveal text-center mb-14">
-            <span className="text-sm font-bold uppercase tracking-widest" style={{ color: '#b91c1c' }}>What We Offer</span>
+            <span className="text-sm font-bold uppercase tracking-widest" style={{ color: '#1a2980' }}>What We Offer</span>
             <h2 className="text-4xl font-black text-gray-900 mt-2 mb-3">Our Services</h2>
             <p className="text-gray-500 text-lg max-w-xl mx-auto">
               Everything your business needs to thrive in the digital world
@@ -116,12 +116,68 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── Portfolio ────────────────────────────────────────────────────── */}
+      <section id="portfolio" className="py-20" style={{ background: '#f0f4ff' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="reveal text-center mb-14">
+            <span className="text-sm font-bold uppercase tracking-widest" style={{ color: '#1a2980' }}>Our Work</span>
+            <h2 className="text-4xl font-black text-gray-900 mt-2 mb-3">Live Client Websites</h2>
+            <p className="text-gray-500 text-lg max-w-xl mx-auto">
+              Real websites we built and delivered for our clients
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { name: 'WedFeast', url: 'https://www.wedfeast.in', desc: 'Wedding catering & feast services', tag: 'Food & Events' },
+              { name: 'Saravana Travel', url: 'https://www.saravanatravel.in', desc: 'Tour & travel booking platform', tag: 'Travel' },
+              { name: 'Modak Beauty Parlour', url: 'https://www.modaknaturalbeautyparlour.in', desc: 'Natural beauty parlour services', tag: 'Beauty & Wellness' },
+              { name: 'Kerala Memory Travels', url: 'https://www.keralamemorytravels.in', desc: 'Kerala tourism & travel packages', tag: 'Travel' },
+            ].map((site, i) => (
+              <a
+                key={site.url}
+                href={site.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`reveal reveal-delay-${i + 1} card-hover group bg-white rounded-2xl overflow-hidden flex flex-col`}
+                style={{ border: '1px solid #e8eeff', boxShadow: '0 2px 16px rgba(26,41,128,0.06)' }}
+              >
+                {/* Screenshot via Google thumbnail */}
+                <div className="relative overflow-hidden bg-gray-100" style={{ height: '160px' }}>
+                  <img
+                    src={`https://www.google.com/s2/favicons?domain=${site.url}&sz=128`}
+                    alt=""
+                    className="absolute top-3 right-3 w-8 h-8 rounded-lg z-10"
+                  />
+                  <iframe
+                    src={site.url}
+                    title={site.name}
+                    className="w-full h-full pointer-events-none scale-75 origin-top-left"
+                    style={{ width: '133%', height: '133%', transform: 'scale(0.75)', transformOrigin: 'top left', border: 'none' }}
+                    loading="lazy"
+                    sandbox="allow-same-origin"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent group-hover:from-blue-900/10 transition-all duration-300" />
+                </div>
+                <div className="p-4 flex flex-col flex-1">
+                  <span className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: '#1a2980' }}>{site.tag}</span>
+                  <h3 className="font-bold text-gray-900 text-base mb-1">{site.name}</h3>
+                  <p className="text-gray-500 text-sm flex-1">{site.desc}</p>
+                  <div className="mt-3 flex items-center gap-1 text-sm font-semibold" style={{ color: '#1a2980' }}>
+                    Visit Site <ArrowRight size={14} />
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── About ────────────────────────────────────────────────────────── */}
       <section id="about" className="py-20" style={{ background: '#f0f4ff' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
             <div className="reveal-left">
-              <span className="text-sm font-bold uppercase tracking-widest" style={{ color: '#b91c1c' }}>Who We Are</span>
+              <span className="text-sm font-bold uppercase tracking-widest" style={{ color: '#1a2980' }}>Who We Are</span>
               <h2 className="text-4xl font-black text-gray-900 mt-2 mb-4">About ASLEN</h2>
               <p className="text-gray-600 leading-relaxed mb-4">
                 ASLEN TECH SOLUTIONS is a forward-thinking digital agency dedicated to helping businesses grow through technology. We combine creativity with technical expertise to deliver solutions that make a real impact.
@@ -137,7 +193,7 @@ export default function Home() {
                   'Post-delivery support included',
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-3 text-gray-700">
-                    <CheckCircle size={18} className="shrink-0" style={{ color: '#b91c1c' }} />
+                    <CheckCircle size={18} className="shrink-0" style={{ color: '#1a2980' }} />
                     {item}
                   </li>
                 ))}
@@ -152,7 +208,7 @@ export default function Home() {
                 { icon: CheckCircle, label: 'Success Rate', value: '100%' },
               ].map(({ icon: Icon, label, value }, i) => (
                 <div key={label} className={`reveal reveal-delay-${i + 1} card-hover rounded-2xl p-6 text-white`}
-                  style={{ background: 'linear-gradient(135deg, #7f1d1d, #b91c1c)' }}>
+                  style={{ background: 'linear-gradient(135deg, #0d1442, #1a2980)' }}>
                   <Icon size={28} className="mb-3 opacity-70" />
                   <div className="text-3xl font-black">{value}</div>
                   <div className="text-sm opacity-70 mt-1">{label}</div>
@@ -167,7 +223,7 @@ export default function Home() {
       <section id="reviews" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="reveal text-center mb-12">
-            <span className="text-sm font-bold uppercase tracking-widest" style={{ color: '#b91c1c' }}>Testimonials</span>
+            <span className="text-sm font-bold uppercase tracking-widest" style={{ color: '#1a2980' }}>Testimonials</span>
             <h2 className="text-4xl font-black text-gray-900 mt-2 mb-3">What Our Clients Say</h2>
             <p className="text-gray-500 text-lg">Real feedback from real clients</p>
           </div>
@@ -194,7 +250,7 @@ export default function Home() {
                     <p className="text-gray-700 text-sm leading-relaxed flex-1">"{r.comment}"</p>
                     <div className="flex items-center gap-2 pt-2" style={{ borderTop: '1px solid #f0f4ff' }}>
                       <img
-                        src={r.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(r.name || 'U')}&background=b91c1c&color=fff`}
+                        src={r.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(r.name || 'U')}&background=1a2980&color=fff`}
                         alt={r.name}
                         className="w-9 h-9 rounded-full object-cover shrink-0"
                         style={{ border: '2px solid #e8eeff' }}
@@ -223,7 +279,7 @@ export default function Home() {
       <section id="contact" className="py-20" style={{ background: '#f0f4ff' }}>
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="reveal text-center mb-12">
-            <span className="text-sm font-bold uppercase tracking-widest" style={{ color: '#b91c1c' }}>Contact</span>
+            <span className="text-sm font-bold uppercase tracking-widest" style={{ color: '#1a2980' }}>Contact</span>
             <h2 className="text-4xl font-black text-gray-900 mt-2 mb-3">Get In Touch</h2>
             <p className="text-gray-500 text-lg">Have a project in mind? Let's talk.</p>
           </div>

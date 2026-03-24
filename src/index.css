@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
-/* ── Royal Red Theme Variables ───────────────────────────────────────────── */
+/* ── Royal Navy Blue Theme Variables ─────────────────────────────────────── */
 :root {
-  --red-950: #1a0000;
-  --red-900: #2d0000;
-  --red-800: #7f1d1d;
-  --red-700: #991b1b;
-  --red-600: #b91c1c;
-  --red-500: #dc2626;
-  --red-400: #ef4444;
-  --gold:    #f59e0b;
-  --white:   #ffffff;
+  --navy-950: #0a0f2e;
+  --navy-900: #0d1442;
+  --navy-800: #111d5e;
+  --navy-700: #1a2980;
+  --navy-600: #1e3a8a;
+  --navy-500: #1d4ed8;
+  --navy-400: #3b82f6;
+  --gold:     #f59e0b;
+  --white:    #ffffff;
 }
 
 @layer base {
@@ -67,12 +67,12 @@
 .reveal-delay-4 { transition-delay: 0.4s; }
 .reveal-delay-5 { transition-delay: 0.5s; }
 
-/* ── Red gradient utility ────────────────────────────────────────────────── */
+/* ── Navy gradient utility ────────────────────────────────────────────────── */
 .bg-royal-red {
-  background: linear-gradient(135deg, var(--red-950) 0%, var(--red-800) 50%, var(--red-600) 100%);
+  background: linear-gradient(135deg, var(--navy-950) 0%, var(--navy-800) 50%, var(--navy-700) 100%);
 }
 
-.text-royal-red { color: var(--red-600); }
+.text-royal-red { color: var(--navy-700); }
 
 /* ── Card hover lift ─────────────────────────────────────────────────────── */
 .card-hover {
@@ -80,12 +80,12 @@
 }
 .card-hover:hover {
   transform: translateY(-4px);
-  box-shadow: 0 20px 40px rgba(127, 29, 29, 0.12);
+  box-shadow: 0 20px 40px rgba(13, 20, 66, 0.12);
 }
 
 /* ── Shimmer button ──────────────────────────────────────────────────────── */
 .btn-navy {
-  background: linear-gradient(135deg, #991b1b, #dc2626);
+  background: linear-gradient(135deg, #1a2980, #1d4ed8);
   color: white;
   position: relative;
   overflow: hidden;

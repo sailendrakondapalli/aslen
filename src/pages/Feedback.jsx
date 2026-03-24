@@ -95,7 +95,7 @@ export default function Feedback() {
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
       {/* Hero */}
-      <div className="py-14 text-center" style={{ background: 'linear-gradient(135deg, #1a0000 0%, #7f1d1d 40%, #b91c1c 100%)' }}>
+      <div className="py-14 text-center" style={{ background: 'linear-gradient(135deg, #0a0f2e 0%, #0d1442 40%, #1a2980 100%)' }}>
         <div className="max-w-2xl mx-auto px-4">
           <MessageSquare size={40} className="text-white/80 mx-auto mb-3" />
           <h1 className="text-4xl font-black text-white mb-2">Share Your Experience</h1>
@@ -129,7 +129,7 @@ export default function Feedback() {
               {/* Google profile preview */}
               <div className="flex items-center gap-3 bg-gray-50 rounded-xl p-3">
                 <img
-                  src={userAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName || 'U')}&background=dc2626&color=fff`}
+                  src={userAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName || 'U')}&background=3b82f6&color=fff`}
                   alt={userName}
                   className="w-10 h-10 rounded-full object-cover border-2 border-blue-200"
                 />
@@ -194,7 +194,9 @@ export default function Feedback() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3">
                       <img
-                        src={r.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(r.name || 'U')}&background=dc2626&color=fff`}
+                        src={r.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(r.name || 'U')}&background=3b82f6&color=fff`}
+                        alt={r.name}
+                        className="w-10 h-10 rounded-full object-cover border-2 border-gray-100 shrink-0"
                       />
                       <div>
                         <p className="font-semibold text-gray-900 text-sm">{r.name || 'Anonymous'}</p>
