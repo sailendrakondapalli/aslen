@@ -41,16 +41,22 @@ export default function Home() {
     <div className="pt-16">
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <section id="home" className="min-h-screen flex items-center relative overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, #0a0f2e 0%, #0d1442 40%, #1a2980 100%)' }}>
+      <section id="home" className="min-h-screen flex items-center relative overflow-hidden">
+        {/* Background image */}
+        <div className="absolute inset-0">
+          <img
+            src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1920&q=80"
+            alt=""
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(10,15,46,0.92) 0%, rgba(13,20,66,0.88) 40%, rgba(26,41,128,0.82) 100%)' }} />
+        </div>
         {/* Decorative blobs */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute top-20 left-10 w-80 h-80 rounded-full blur-3xl opacity-20"
             style={{ background: 'radial-gradient(circle, #3b82f6, transparent)' }} />
           <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full blur-3xl opacity-15"
             style={{ background: 'radial-gradient(circle, #1d4ed8, transparent)' }} />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-3xl opacity-10"
-            style={{ background: 'radial-gradient(circle, #f59e0b, transparent)' }} />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
@@ -128,10 +134,34 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { name: 'WedFeast', url: 'https://www.wedfeast.in', desc: 'Wedding catering & feast services', tag: 'Food & Events' },
-              { name: 'Saravana Travel', url: 'https://www.saravanatravel.in', desc: 'Tour & travel booking platform', tag: 'Travel' },
-              { name: 'Modak Beauty Parlour', url: 'https://www.modaknaturalbeautyparlour.in', desc: 'Natural beauty parlour services', tag: 'Beauty & Wellness' },
-              { name: 'Kerala Memory Travels', url: 'https://www.keralamemorytravels.in', desc: 'Kerala tourism & travel packages', tag: 'Travel' },
+              {
+                name: 'WedFeast',
+                url: 'https://www.wedfeast.in',
+                desc: 'Wedding catering & feast services',
+                tag: 'Food & Events',
+                img: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=600&q=80',
+              },
+              {
+                name: 'Saravana Travel',
+                url: 'https://www.saravanatravel.in',
+                desc: 'Tour & travel booking platform',
+                tag: 'Travel',
+                img: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&q=80',
+              },
+              {
+                name: 'Modak Beauty Parlour',
+                url: 'https://www.modaknaturalbeautyparlour.in',
+                desc: 'Natural beauty parlour services',
+                tag: 'Beauty & Wellness',
+                img: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600&q=80',
+              },
+              {
+                name: 'Kerala Memory Travels',
+                url: 'https://www.keralamemorytravels.in',
+                desc: 'Kerala tourism & travel packages',
+                tag: 'Travel',
+                img: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=600&q=80',
+              },
             ].map((site, i) => (
               <a
                 key={site.url}
@@ -141,25 +171,18 @@ export default function Home() {
                 className={`reveal reveal-delay-${i + 1} card-hover group bg-white rounded-2xl overflow-hidden flex flex-col`}
                 style={{ border: '1px solid #e8eeff', boxShadow: '0 2px 16px rgba(26,41,128,0.06)' }}
               >
-                {/* Screenshot via Google thumbnail */}
-                <div className="relative overflow-hidden bg-gray-100" style={{ height: '160px' }}>
+                <div className="relative overflow-hidden" style={{ height: '160px' }}>
                   <img
-                    src={`https://www.google.com/s2/favicons?domain=${site.url}&sz=128`}
-                    alt=""
-                    className="absolute top-3 right-3 w-8 h-8 rounded-lg z-10"
+                    src={site.img}
+                    alt={site.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <iframe
-                    src={site.url}
-                    title={site.name}
-                    className="w-full h-full pointer-events-none scale-75 origin-top-left"
-                    style={{ width: '133%', height: '133%', transform: 'scale(0.75)', transformOrigin: 'top left', border: 'none' }}
-                    loading="lazy"
-                    sandbox="allow-same-origin"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent group-hover:from-blue-900/10 transition-all duration-300" />
+                  <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(13,20,66,0.6) 0%, transparent 60%)' }} />
+                  <span className="absolute bottom-3 left-3 text-white text-xs font-bold uppercase tracking-wider bg-white/20 backdrop-blur-sm px-2 py-1 rounded-full">
+                    {site.tag}
+                  </span>
                 </div>
                 <div className="p-4 flex flex-col flex-1">
-                  <span className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: '#1a2980' }}>{site.tag}</span>
                   <h3 className="font-bold text-gray-900 text-base mb-1">{site.name}</h3>
                   <p className="text-gray-500 text-sm flex-1">{site.desc}</p>
                   <div className="mt-3 flex items-center gap-1 text-sm font-semibold" style={{ color: '#1a2980' }}>
