@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { useAuthStore } from './store/authStore'
 import Navbar from './components/Navbar'
@@ -11,6 +11,13 @@ import Dashboard from './pages/Dashboard'
 import ServiceDetail from './pages/ServiceDetail'
 import AdminDashboard from './pages/AdminDashboard'
 import Feedback from './pages/Feedback'
+
+// Scroll to top on every route change
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  useEffect(() => { window.scrollTo(0, 0) }, [pathname])
+  return null
+}
 
 // Inner component so useNavigate works inside BrowserRouter
 function AppInner() {
@@ -24,6 +31,7 @@ function AppInner() {
 
   return (
     <>
+      <ScrollToTop />
       <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
       <Navbar />
       <Routes>

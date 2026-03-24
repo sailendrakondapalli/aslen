@@ -42,13 +42,13 @@ export default function Home() {
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <section id="home" className="min-h-screen flex items-center relative overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, #0a0f2e 0%, #0d1442 40%, #1a2980 100%)' }}>
+        style={{ background: 'linear-gradient(135deg, #1a0000 0%, #7f1d1d 40%, #b91c1c 100%)' }}>
         {/* Decorative blobs */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute top-20 left-10 w-80 h-80 rounded-full blur-3xl opacity-20"
-            style={{ background: 'radial-gradient(circle, #3b82f6, transparent)' }} />
+            style={{ background: 'radial-gradient(circle, #ef4444, transparent)' }} />
           <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full blur-3xl opacity-15"
-            style={{ background: 'radial-gradient(circle, #1d4ed8, transparent)' }} />
+            style={{ background: 'radial-gradient(circle, #dc2626, transparent)' }} />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-3xl opacity-10"
             style={{ background: 'radial-gradient(circle, #f59e0b, transparent)' }} />
         </div>
@@ -63,7 +63,7 @@ export default function Home() {
 
             <h1 className="reveal reveal-delay-1 text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-tight mb-4">
               ASLEN<br />
-              <span style={{ background: 'linear-gradient(90deg, #60a5fa, #a78bfa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              <span style={{ background: 'linear-gradient(90deg, #fca5a5, #fbbf24)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                 TECH SOLUTIONS
               </span>
             </h1>
@@ -100,7 +100,7 @@ export default function Home() {
       <section id="services" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="reveal text-center mb-14">
-            <span className="text-sm font-bold uppercase tracking-widest" style={{ color: '#1a2980' }}>What We Offer</span>
+            <span className="text-sm font-bold uppercase tracking-widest" style={{ color: '#b91c1c' }}>What We Offer</span>
             <h2 className="text-4xl font-black text-gray-900 mt-2 mb-3">Our Services</h2>
             <p className="text-gray-500 text-lg max-w-xl mx-auto">
               Everything your business needs to thrive in the digital world
@@ -121,7 +121,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
             <div className="reveal-left">
-              <span className="text-sm font-bold uppercase tracking-widest" style={{ color: '#1a2980' }}>Who We Are</span>
+              <span className="text-sm font-bold uppercase tracking-widest" style={{ color: '#b91c1c' }}>Who We Are</span>
               <h2 className="text-4xl font-black text-gray-900 mt-2 mb-4">About ASLEN</h2>
               <p className="text-gray-600 leading-relaxed mb-4">
                 ASLEN TECH SOLUTIONS is a forward-thinking digital agency dedicated to helping businesses grow through technology. We combine creativity with technical expertise to deliver solutions that make a real impact.
@@ -137,7 +137,7 @@ export default function Home() {
                   'Post-delivery support included',
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-3 text-gray-700">
-                    <CheckCircle size={18} className="shrink-0" style={{ color: '#1a2980' }} />
+                    <CheckCircle size={18} className="shrink-0" style={{ color: '#b91c1c' }} />
                     {item}
                   </li>
                 ))}
@@ -152,7 +152,7 @@ export default function Home() {
                 { icon: CheckCircle, label: 'Success Rate', value: '100%' },
               ].map(({ icon: Icon, label, value }, i) => (
                 <div key={label} className={`reveal reveal-delay-${i + 1} card-hover rounded-2xl p-6 text-white`}
-                  style={{ background: 'linear-gradient(135deg, #0d1442, #1a2980)' }}>
+                  style={{ background: 'linear-gradient(135deg, #7f1d1d, #b91c1c)' }}>
                   <Icon size={28} className="mb-3 opacity-70" />
                   <div className="text-3xl font-black">{value}</div>
                   <div className="text-sm opacity-70 mt-1">{label}</div>
@@ -167,7 +167,7 @@ export default function Home() {
       <section id="reviews" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="reveal text-center mb-12">
-            <span className="text-sm font-bold uppercase tracking-widest" style={{ color: '#1a2980' }}>Testimonials</span>
+            <span className="text-sm font-bold uppercase tracking-widest" style={{ color: '#b91c1c' }}>Testimonials</span>
             <h2 className="text-4xl font-black text-gray-900 mt-2 mb-3">What Our Clients Say</h2>
             <p className="text-gray-500 text-lg">Real feedback from real clients</p>
           </div>
@@ -194,7 +194,7 @@ export default function Home() {
                     <p className="text-gray-700 text-sm leading-relaxed flex-1">"{r.comment}"</p>
                     <div className="flex items-center gap-2 pt-2" style={{ borderTop: '1px solid #f0f4ff' }}>
                       <img
-                        src={r.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(r.name || 'U')}&background=1a2980&color=fff`}
+                        src={r.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(r.name || 'U')}&background=b91c1c&color=fff`}
                         alt={r.name}
                         className="w-9 h-9 rounded-full object-cover shrink-0"
                         style={{ border: '2px solid #e8eeff' }}
@@ -223,7 +223,7 @@ export default function Home() {
       <section id="contact" className="py-20" style={{ background: '#f0f4ff' }}>
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="reveal text-center mb-12">
-            <span className="text-sm font-bold uppercase tracking-widest" style={{ color: '#1a2980' }}>Contact</span>
+            <span className="text-sm font-bold uppercase tracking-widest" style={{ color: '#b91c1c' }}>Contact</span>
             <h2 className="text-4xl font-black text-gray-900 mt-2 mb-3">Get In Touch</h2>
             <p className="text-gray-500 text-lg">Have a project in mind? Let's talk.</p>
           </div>
