@@ -13,21 +13,14 @@ import AdminDashboard from './pages/AdminDashboard'
 
 export default function App() {
   const initialize = useAuthStore((s) => s.initialize)
-  const loading = useAuthStore((s) => s.loading)
 
   useEffect(() => {
     const cleanup = initialize()
     return cleanup
   }, [])
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900">
-        <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-      </div>
-    )
-  }
-
+  // Don't block render — user is hydrated from cache instantly
+  // loading only affects protected route redirects, not the whole UI
   return (
     <BrowserRouter>
       <Toaster position="top-right" toastOptions={{ duration: 3000 }} />

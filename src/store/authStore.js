@@ -1,21 +1,45 @@
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 
+const USER_CACHE_KEY = 'aslen_user'
+
+// Read cached user from localStorage for instant UI on page load
+const getCachedUser = () => {
+  try {
+    const raw = localStorage.getItem(USER_CACHE_KEY)
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
+
+const setCachedUser = (user) => {
+  try {
+    if (user) localStorage.setItem(USER_CACHE_KEY, JSON.stringify(user))
+    else localStorage.removeItem(USER_CACHE_KEY)
+  } catch {}
+}
+
 export const useAuthStore = create((set) => ({
-  user: null,
+  // Hydrate from cache instantly — no flicker, no spinner delay
+  user: getCachedUser(),
   loading: true,
 
   signInWithGoogle: async () => {
     if (!supabase) throw new Error('Supabase not configured')
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/dashboard`, skipBrowserRedirect: false },
+      options: {
+        redirectTo: `${window.location.origin}/dashboard`,
+        skipBrowserRedirect: false,
+      },
     })
     if (error) throw error
   },
 
   signOut: async () => {
     if (supabase) await supabase.auth.signOut()
+    setCachedUser(null)
     set({ user: null })
   },
 
@@ -25,24 +49,20 @@ export const useAuthStore = create((set) => ({
       return
     }
 
-    // Immediately resolve existing session so UI doesn't wait
+    // Resolve session immediately and update cache
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        set({ user: session.user, loading: false })
-        syncUserToDb(session.user)
-      } else {
-        set({ user: null, loading: false })
-      }
+      const user = session?.user ?? null
+      setCachedUser(user)
+      set({ user, loading: false })
+      if (user) syncUserToDb(user)
     })
 
-    // Also listen for real-time auth changes (login, logout, token refresh)
+    // Listen for auth changes (login redirect, logout, token refresh)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        set({ user: session.user, loading: false })
-        syncUserToDb(session.user)
-      } else {
-        set({ user: null, loading: false })
-      }
+      const user = session?.user ?? null
+      setCachedUser(user)
+      set({ user, loading: false })
+      if (user) syncUserToDb(user)
     })
 
     return () => subscription.unsubscribe()
