@@ -167,9 +167,11 @@ export default function Home() {
                     </div>
                     <p className="text-gray-700 text-sm leading-relaxed flex-1">"{r.comment}"</p>
                     <div className="flex items-center gap-2 pt-2 border-t border-gray-50">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-xs shrink-0">
-                        {r.name?.charAt(0)?.toUpperCase() || 'U'}
-                      </div>
+                      <img
+                        src={r.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(r.name || 'U')}&background=3b82f6&color=fff`}
+                        alt={r.name}
+                        className="w-8 h-8 rounded-full object-cover border border-gray-100 shrink-0"
+                      />
                       <div>
                         <p className="text-sm font-semibold text-gray-900">{r.name || 'Anonymous'}</p>
                         <p className="text-xs text-gray-400">

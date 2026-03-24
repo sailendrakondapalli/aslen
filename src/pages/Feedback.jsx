@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Star, Send, Loader2, MessageSquare } from 'lucide-react'
+import { Star, Send, Loader2, MessageSquare, LogIn } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../store/authStore'
 import toast from 'react-hot-toast'
@@ -36,18 +37,15 @@ export default function Feedback() {
   const { user } = useAuthStore()
   const [rating, setRating] = useState(0)
   const [comment, setComment] = useState('')
-  const [name, setName] = useState(user?.user_metadata?.full_name || '')
   const [loading, setLoading] = useState(false)
   const [reviews, setReviews] = useState([])
   const [loadingReviews, setLoadingReviews] = useState(true)
 
-  useEffect(() => {
-    fetchReviews()
-  }, [])
+  // Pull name & avatar from Google profile
+  const userName = user?.user_metadata?.full_name || user?.user_metadata?.name || ''
+  const userAvatar = user?.user_metadata?.avatar_url || ''
 
-  useEffect(() => {
-    if (user?.user_metadata?.full_name) setName(user.user_metadata.full_name)
-  }, [user])
+  useEffect(() => { fetchReviews() }, [])
 
   const fetchReviews = async () => {
     if (!supabase) { setLoadingReviews(false); return }
@@ -61,17 +59,18 @@ export default function Feedback() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (!user) { toast.error('Please sign in to submit feedback'); return }
     if (rating === 0) { toast.error('Please select a star rating'); return }
     if (!comment.trim()) { toast.error('Please write a comment'); return }
-    if (!name.trim()) { toast.error('Please enter your name'); return }
     if (!supabase) { toast.error('Service unavailable'); return }
 
     setLoading(true)
     try {
       const { error } = await supabase.from('feedback').insert({
-        user_id: null, // avoid FK constraint issues
-        user_email: user?.email || null,
-        name: name.trim(),
+        user_id: user.id,
+        user_email: user.email,
+        name: userName,
+        avatar_url: userAvatar,
         rating,
         comment: comment.trim(),
       })
@@ -81,7 +80,7 @@ export default function Feedback() {
       setComment('')
       fetchReviews()
     } catch (err) {
-      console.error('Feedback submit error:', err)
+      console.error('Feedback error:', err)
       toast.error(err?.message || 'Failed to submit. Please try again.')
     } finally {
       setLoading(false)
@@ -111,51 +110,65 @@ export default function Feedback() {
       </div>
 
       <div className="max-w-3xl mx-auto px-4 py-10 space-y-10">
+
         {/* Submit form */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <h2 className="text-xl font-bold text-gray-900 mb-6">Write a Review</h2>
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Enter your name"
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Rating</label>
-              <StarRating value={rating} onChange={setRating} />
-              {rating > 0 && (
-                <p className="text-sm text-gray-500 mt-1">
-                  {['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'][rating]}
-                </p>
-              )}
+          {!user ? (
+            <div className="text-center py-8 space-y-3">
+              <p className="text-gray-500">Sign in with Google to submit your review</p>
+              <Link to="/login"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity">
+                <LogIn size={18} /> Sign In to Review
+              </Link>
             </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Google profile preview */}
+              <div className="flex items-center gap-3 bg-gray-50 rounded-xl p-3">
+                <img
+                  src={userAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName || 'U')}&background=3b82f6&color=fff`}
+                  alt={userName}
+                  className="w-10 h-10 rounded-full object-cover border-2 border-blue-200"
+                />
+                <div>
+                  <p className="font-semibold text-gray-900 text-sm">{userName || 'Anonymous'}</p>
+                  <p className="text-xs text-gray-400">{user.email}</p>
+                </div>
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Your Comment</label>
-              <textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                rows={4}
-                placeholder="Tell us about your experience with ASLEN TECH SOLUTIONS..."
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-              />
-            </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Rating</label>
+                <StarRating value={rating} onChange={setRating} />
+                {rating > 0 && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    {['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'][rating]}
+                  </p>
+                )}
+              </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-60 flex items-center justify-center gap-2"
-            >
-              {loading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
-              {loading ? 'Submitting...' : 'Submit Review'}
-            </button>
-          </form>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Your Comment</label>
+                <textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  rows={4}
+                  placeholder="Tell us about your experience with ASLEN TECH SOLUTIONS..."
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-60 flex items-center justify-center gap-2"
+              >
+                {loading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+                {loading ? 'Submitting...' : 'Submit Review'}
+              </button>
+            </form>
+          )}
         </div>
 
         {/* Reviews list */}
@@ -179,12 +192,15 @@ export default function Feedback() {
                 <div key={r.id} className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm shrink-0">
-                        {r.name?.charAt(0)?.toUpperCase() || 'U'}
-                      </div>
+                      <img
+                        src={r.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(r.name || 'U')}&background=3b82f6&color=fff`}
+                        alt={r.name}
+                        className="w-10 h-10 rounded-full object-cover border-2 border-gray-100 shrink-0"
+                      />
                       <div>
                         <p className="font-semibold text-gray-900 text-sm">{r.name || 'Anonymous'}</p>
                         <p className="text-xs text-gray-400">
+                          {r.user_email && <span className="mr-2">{r.user_email}</span>}
                           {new Date(r.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </p>
                       </div>

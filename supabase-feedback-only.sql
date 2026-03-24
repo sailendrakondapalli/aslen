@@ -11,6 +11,7 @@ create table public.feedback (
   user_id uuid,
   user_email text,
   name text,
+  avatar_url text,
   rating integer check (rating >= 1 and rating <= 5),
   comment text,
   created_at timestamptz default now()
