@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase'
 
 export const useAuthStore = create((set) => ({
   user: null,
-  loading: true, // true until session is resolved
+  loading: true,
 
   signInWithGoogle: async () => {
     if (!supabase) throw new Error('Supabase not configured')
@@ -25,9 +25,17 @@ export const useAuthStore = create((set) => ({
       return
     }
 
-    // onAuthStateChange fires immediately with the current session,
-    // including when Google redirects back with a token in the URL.
-    // This is the single source of truth — no need for getSession separately.
+    // Immediately resolve existing session so UI doesn't wait
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        set({ user: session.user, loading: false })
+        syncUserToDb(session.user)
+      } else {
+        set({ user: null, loading: false })
+      }
+    })
+
+    // Also listen for real-time auth changes (login, logout, token refresh)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         set({ user: session.user, loading: false })
