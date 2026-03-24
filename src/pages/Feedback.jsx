@@ -69,7 +69,7 @@ export default function Feedback() {
     setLoading(true)
     try {
       const { error } = await supabase.from('feedback').insert({
-        user_id: user?.id || null,
+        user_id: null, // avoid FK constraint issues
         user_email: user?.email || null,
         name: name.trim(),
         rating,
@@ -80,8 +80,9 @@ export default function Feedback() {
       setRating(0)
       setComment('')
       fetchReviews()
-    } catch {
-      toast.error('Failed to submit. Please try again.')
+    } catch (err) {
+      console.error('Feedback submit error:', err)
+      toast.error(err?.message || 'Failed to submit. Please try again.')
     } finally {
       setLoading(false)
     }

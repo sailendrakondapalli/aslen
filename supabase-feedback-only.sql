@@ -1,12 +1,14 @@
 -- ============================================
--- Run this ONLY if you already ran supabase-setup.sql before
--- This adds just the feedback table + policies
+-- Run this if you already ran supabase-setup.sql
+-- Adds feedback table + policies (safe to re-run)
 -- ============================================
 
--- Feedback table
-create table if not exists public.feedback (
+-- Drop and recreate feedback table cleanly
+drop table if exists public.feedback;
+
+create table public.feedback (
   id uuid primary key default gen_random_uuid(),
-  user_id uuid references public.users(id) on delete set null,
+  user_id uuid,
   user_email text,
   name text,
   rating integer check (rating >= 1 and rating <= 5),
@@ -17,7 +19,7 @@ create table if not exists public.feedback (
 -- Enable RLS
 alter table public.feedback enable row level security;
 
--- Drop old policies if they exist (safe to re-run)
+-- Drop old policies if they exist
 drop policy if exists "Anyone can submit feedback" on public.feedback;
 drop policy if exists "Anyone can view feedback" on public.feedback;
 drop policy if exists "Admins can delete feedback" on public.feedback;
