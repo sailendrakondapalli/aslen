@@ -27,13 +27,15 @@ export default function Navbar() {
   ]
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md shadow-sm"
+      style={{ borderBottom: '1px solid #e8eeff' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
 
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-lg flex items-center justify-center"
+              style={{ background: 'linear-gradient(135deg, #0d1442, #1a2980)' }}>
               <span className="text-white font-black text-sm">A</span>
             </div>
             <div className="leading-tight">
@@ -74,7 +76,7 @@ export default function Navbar() {
                 </button>
               </div>
             ) : (
-              <Link to="/login" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity">
+              <Link to="/login" className="btn-navy px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity">
                 Sign In
               </Link>
             )}
@@ -111,7 +113,7 @@ export default function Navbar() {
                 </button>
               </div>
             ) : (
-              <Link to="/login" onClick={() => setOpen(false)} className="block bg-gradient-to-r from-blue-600 to-purple-600 text-white text-center px-4 py-2 rounded-lg font-semibold">
+              <Link to="/login" onClick={() => setOpen(false)} className="block btn-navy text-white text-center px-4 py-2 rounded-lg font-semibold">
                 Sign In
               </Link>
             )}

@@ -94,7 +94,7 @@ export default function Feedback() {
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
       {/* Hero */}
-      <div className="bg-gradient-to-br from-blue-600 to-purple-700 py-14 text-center">
+      <div className="py-14 text-center" style={{ background: 'linear-gradient(135deg, #0a0f2e 0%, #0d1442 40%, #1a2980 100%)' }}>
         <div className="max-w-2xl mx-auto px-4">
           <MessageSquare size={40} className="text-white/80 mx-auto mb-3" />
           <h1 className="text-4xl font-black text-white mb-2">Share Your Experience</h1>
@@ -119,7 +119,7 @@ export default function Feedback() {
             <div className="text-center py-8 space-y-3">
               <p className="text-gray-500">Sign in with Google to submit your review</p>
               <Link to="/login"
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity">
+                className="btn-navy inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity">
                 <LogIn size={18} /> Sign In to Review
               </Link>
             </div>
@@ -162,7 +162,7 @@ export default function Feedback() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-60 flex items-center justify-center gap-2"
+                className="btn-navy w-full py-3 rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-60 flex items-center justify-center gap-2"
               >
                 {loading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
                 {loading ? 'Submitting...' : 'Submit Review'}
