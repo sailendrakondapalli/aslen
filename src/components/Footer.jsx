@@ -1,10 +1,11 @@
+import { Link } from 'react-router-dom'
 import { Mail, Phone, MapPin, Globe } from 'lucide-react'
 
 export default function Footer() {
   return (
     <footer className="bg-gray-900 text-gray-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-3">
@@ -27,6 +28,16 @@ export default function Footer() {
                   <a href={`/#${l.toLowerCase()}`} className="hover:text-blue-400 transition-colors">{l}</a>
                 </li>
               ))}
+            </ul>
+          </div>
+
+          {/* Legal */}
+          <div>
+            <h3 className="text-white font-semibold mb-4">Legal</h3>
+            <ul className="space-y-2 text-sm">
+              <li><Link to="/privacy-policy" className="hover:text-blue-400 transition-colors">Privacy Policy</Link></li>
+              <li><Link to="/refund-policy" className="hover:text-blue-400 transition-colors">Refund Policy</Link></li>
+              <li><Link to="/cancellation-policy" className="hover:text-blue-400 transition-colors">Cancellation Policy</Link></li>
             </ul>
           </div>
 

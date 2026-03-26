@@ -11,6 +11,9 @@ import Dashboard from './pages/Dashboard'
 import ServiceDetail from './pages/ServiceDetail'
 import AdminDashboard from './pages/AdminDashboard'
 import Feedback from './pages/Feedback'
+import PrivacyPolicy from './pages/PrivacyPolicy'
+import RefundPolicy from './pages/RefundPolicy'
+import CancellationPolicy from './pages/CancellationPolicy'
 
 // Scroll to top on every route change
 function ScrollToTop() {
@@ -41,6 +44,9 @@ function AppInner() {
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
         <Route path="/feedback" element={<><Feedback /><Footer /></>} />
+        <Route path="/privacy-policy" element={<><PrivacyPolicy /><Footer /></>} />
+        <Route path="/refund-policy" element={<><RefundPolicy /><Footer /></>} />
+        <Route path="/cancellation-policy" element={<><CancellationPolicy /><Footer /></>} />
       </Routes>
     </>
   )

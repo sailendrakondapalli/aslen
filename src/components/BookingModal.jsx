@@ -113,8 +113,6 @@ export default function BookingModal({ service, onClose }) {
         contact: '',
       },
       theme: { color: '#2563eb' },
-      // Pre-select the method if user clicked a specific one
-      ...(method && { method: { [method]: true } }),
       handler: async (response) => {
         try {
           const booking = await saveBooking(response.razorpay_payment_id, method || 'razorpay')
