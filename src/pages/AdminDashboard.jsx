@@ -47,6 +47,7 @@ export default function AdminDashboard() {
       supabase.from('users').select('*').order('created_at', { ascending: false }),
       supabase.from('feedback').select('*').order('created_at', { ascending: false }),
     ])
+    console.log('Bookings sample:', b?.[0])
     setBookings(b || [])
     setClients(u || [])
     setFeedbacks(f || [])
