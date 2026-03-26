@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { supabase } from '../lib/supabase'
-import { Loader2, CheckCircle, LogOut, LayoutDashboard, AlertCircle, X, Upload, ArrowLeft } from 'lucide-react'
+import { Loader2, CheckCircle, LogOut, LayoutDashboard, AlertCircle, X, Upload, ArrowLeft, Star, Send, PartyPopper } from 'lucide-react'
 import { ADMIN_EMAILS } from '../data/services'
 import toast from 'react-hot-toast'
 
@@ -11,6 +11,8 @@ const statusColor = {
   confirmed: 'bg-blue-100 text-blue-700',
   in_progress: 'bg-yellow-100 text-yellow-700',
   completed: 'bg-green-100 text-green-700',
+  pending_final_verification: 'bg-yellow-100 text-yellow-700',
+  fully_completed: 'bg-emerald-100 text-emerald-700',
   cancelled: 'bg-red-100 text-red-700',
 }
 
@@ -19,7 +21,124 @@ const statusLabel = {
   confirmed: 'Confirmed',
   in_progress: 'In Progress',
   completed: 'Completed',
+  pending_final_verification: 'Final Payment Verification',
+  fully_completed: 'Fully Completed ✓',
   cancelled: 'Cancelled',
+}
+
+// ── Star Rating ──────────────────────────────────────────────────────────────
+function StarRating({ value, onChange }) {
+  const [hovered, setHovered] = useState(0)
+  return (
+    <div className="flex gap-2 justify-center">
+      {[1,2,3,4,5].map((star) => (
+        <button key={star} type="button"
+          onClick={() => onChange(star)}
+          onMouseEnter={() => setHovered(star)}
+          onMouseLeave={() => setHovered(0)}
+          className="transition-transform hover:scale-110">
+          <Star size={36} className={`transition-colors ${star <= (hovered || value) ? 'fill-yellow-400 text-yellow-400' : 'fill-gray-200 text-gray-200'}`} />
+        </button>
+      ))}
+    </div>
+  )
+}
+
+// ── Thank You + Rating Modal ─────────────────────────────────────────────────
+function ThankYouModal({ booking, onClose }) {
+  const { user } = useAuthStore()
+  const [rating, setRating] = useState(0)
+  const [comment, setComment] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
+
+  const userName = user?.user_metadata?.full_name || user?.user_metadata?.name || ''
+  const userAvatar = user?.user_metadata?.avatar_url || ''
+
+  const handleSubmit = async () => {
+    if (rating === 0) { toast.error('Please select a rating'); return }
+    if (!comment.trim()) { toast.error('Please write a comment'); return }
+    setLoading(true)
+    try {
+      const { error } = await supabase.from('feedback').insert({
+        user_id: user.id,
+        user_email: user.email,
+        name: userName,
+        avatar_url: userAvatar,
+        rating,
+        comment: comment.trim(),
+      })
+      if (error) throw error
+      setSubmitted(true)
+    } catch (err) {
+      toast.error('Failed to submit. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+        {submitted ? (
+          <div className="p-8 text-center space-y-4">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+              <CheckCircle size={32} className="text-green-500" />
+            </div>
+            <h2 className="text-2xl font-black text-gray-900">Thank You!</h2>
+            <p className="text-gray-500">Your feedback means a lot to us.</p>
+            <button onClick={onClose}
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold hover:opacity-90 transition-opacity">
+              Close
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Thank you header */}
+            <div className="bg-gradient-to-r from-emerald-500 to-green-600 p-6 text-center text-white">
+              <PartyPopper size={36} className="mx-auto mb-2" />
+              <h2 className="text-2xl font-black">Project Completed!</h2>
+              <p className="text-white/80 text-sm mt-1">Thank you for choosing ASLEN TECH SOLUTIONS</p>
+              <p className="text-white/70 text-xs mt-1">{booking.service_title} — {booking.package_name}</p>
+            </div>
+
+            <div className="p-6 space-y-5">
+              <div className="text-center">
+                <p className="text-gray-700 font-semibold mb-1">How was your experience?</p>
+                <p className="text-gray-400 text-sm mb-4">Rate us and share your feedback</p>
+                <StarRating value={rating} onChange={setRating} />
+                {rating > 0 && (
+                  <p className="text-sm text-gray-500 mt-2">
+                    {['','Poor','Fair','Good','Very Good','Excellent'][rating]}
+                  </p>
+                )}
+              </div>
+
+              <textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                rows={3}
+                placeholder="Tell us about your experience..."
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              />
+
+              <div className="flex gap-3">
+                <button onClick={onClose}
+                  className="flex-1 border border-gray-200 text-gray-600 py-3 rounded-xl font-semibold hover:bg-gray-50 transition-colors text-sm">
+                  Skip
+                </button>
+                <button onClick={handleSubmit} disabled={loading}
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-60 flex items-center justify-center gap-2">
+                  {loading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                  Submit
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  )
 }
 
 // ── Remaining Payment Modal ──────────────────────────────────────────────────
@@ -159,6 +278,7 @@ export default function Dashboard() {
   const [bookings, setBookings] = useState([])
   const [loading, setLoading] = useState(true)
   const [payingBooking, setPayingBooking] = useState(null)
+  const [thankYouBooking, setThankYouBooking] = useState(null)
   const navigate = useNavigate()
 
   const isAdmin = user && ADMIN_EMAILS.includes(user.email)
@@ -170,7 +290,17 @@ export default function Dashboard() {
       .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
-      .then(({ data }) => { setBookings(data || []); setLoading(false) })
+      .then(({ data }) => {
+        setBookings(data || [])
+        setLoading(false)
+        // Auto-show thank you modal for newly fully_completed bookings
+        const seen = JSON.parse(localStorage.getItem('seen_completed') || '[]')
+        const newlyDone = (data || []).find(b => b.status === 'fully_completed' && !seen.includes(b.id))
+        if (newlyDone) {
+          setThankYouBooking(newlyDone)
+          localStorage.setItem('seen_completed', JSON.stringify([...seen, newlyDone.id]))
+        }
+      })
       .catch(() => setLoading(false))
   }
 
@@ -332,8 +462,16 @@ export default function Dashboard() {
                       </div>
                     )}
 
+                    {/* Fully completed — all done */}
+                    {b.status === 'fully_completed' && (
+                      <div className="mt-3 rounded-xl px-4 py-2 flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-sm text-emerald-700">
+                        <CheckCircle size={15} className="text-emerald-500" />
+                        <span className="font-semibold">Project fully completed — Thank you for choosing us!</span>
+                      </div>
+                    )}
+
                     {/* Fully paid */}
-                    {!isCancelled && remaining === 0 && (
+                    {!isCancelled && b.status !== 'fully_completed' && remaining === 0 && (
                       <div className="mt-3 rounded-xl px-4 py-2 flex items-center gap-2 bg-green-50 border border-green-200 text-sm text-green-700">
                         <CheckCircle size={15} className="text-green-500" />
                         <span className="font-semibold">Fully paid — no balance due</span>
@@ -353,6 +491,14 @@ export default function Dashboard() {
           booking={payingBooking}
           onClose={() => setPayingBooking(null)}
           onSuccess={fetchBookings}
+        />
+      )}
+
+      {/* Thank you + rating modal */}
+      {thankYouBooking && (
+        <ThankYouModal
+          booking={thankYouBooking}
+          onClose={() => setThankYouBooking(null)}
         />
       )}
     </div>
