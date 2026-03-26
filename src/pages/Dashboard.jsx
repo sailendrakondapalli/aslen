@@ -51,6 +51,7 @@ function RemainingPayModal({ booking, onClose, onSuccess }) {
 
       const { data: urlData } = supabase.storage.from('payment-screenshots').getPublicUrl(path)
 
+      console.log('Updating booking id:', booking.id, 'with url:', urlData.publicUrl)
       const { error, data: updateData } = await supabase.from('bookings').update({
         remaining_screenshot_url: urlData.publicUrl,
         status: 'pending_final_verification',
