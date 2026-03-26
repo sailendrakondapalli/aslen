@@ -85,7 +85,7 @@ export const services = [
       {
         name: 'Template Design',
         price: 399,
-        advance: 49,
+        advance: 11,
         features: [
           'Custom Design',
           'Print Ready',
