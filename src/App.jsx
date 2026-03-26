@@ -44,9 +44,9 @@ function AppInner() {
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
         <Route path="/feedback" element={<><Feedback /><Footer /></>} />
-        <Route path="/privacy-policy" element={<><PrivacyPolicy /><Footer /></>} />
-        <Route path="/refund-policy" element={<><RefundPolicy /><Footer /></>} />
-        <Route path="/cancellation-policy" element={<><CancellationPolicy /><Footer /></>} />
+        <Route path="/Policy/PrivacyPolicy" element={<><PrivacyPolicy /><Footer /></>} />
+        <Route path="/Policy/RefundPolicy" element={<><RefundPolicy /><Footer /></>} />
+        <Route path="/Policy/CancellationPolicy" element={<><CancellationPolicy /><Footer /></>} />
       </Routes>
     </>
   )

@@ -35,9 +35,9 @@ export default function Footer() {
           <div>
             <h3 className="text-white font-semibold mb-4">Legal</h3>
             <ul className="space-y-2 text-sm">
-              <li><Link to="/privacy-policy" className="hover:text-blue-400 transition-colors">Privacy Policy</Link></li>
-              <li><Link to="/refund-policy" className="hover:text-blue-400 transition-colors">Refund Policy</Link></li>
-              <li><Link to="/cancellation-policy" className="hover:text-blue-400 transition-colors">Cancellation Policy</Link></li>
+              <li><Link to="/Policy/PrivacyPolicy" className="hover:text-blue-400 transition-colors">Privacy Policy</Link></li>
+              <li><Link to="/Policy/RefundPolicy" className="hover:text-blue-400 transition-colors">Refund Policy</Link></li>
+              <li><Link to="/Policy/CancellationPolicy" className="hover:text-blue-400 transition-colors">Cancellation Policy</Link></li>
             </ul>
           </div>
 
