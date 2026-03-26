@@ -320,7 +320,7 @@ export default function Dashboard() {
 
   const totalSpent = bookings.reduce((s, b) => s + (b.advance_paid || 0), 0)
   const totalRemaining = bookings
-    .filter(b => b.status !== 'cancelled')
+    .filter(b => b.status !== 'cancelled' && b.status !== 'fully_completed')
     .reduce((s, b) => s + Math.max(0, (b.total_amount || 0) - (b.advance_paid || 0)), 0)
 
   return (
@@ -354,7 +354,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
           {[
             { label: 'Total Bookings', value: bookings.length },
-            { label: 'Completed', value: bookings.filter(b => b.status === 'completed').length },
+            { label: 'Completed', value: bookings.filter(b => b.status === 'completed' || b.status === 'fully_completed').length },
             { label: 'Advance Paid', value: `₹${totalSpent.toLocaleString()}` },
             { label: 'Balance Due', value: `₹${totalRemaining.toLocaleString()}` },
           ].map(({ label, value }) => (
@@ -386,7 +386,7 @@ export default function Dashboard() {
           ) : (
             <div className="divide-y divide-gray-50">
               {bookings.map((b) => {
-                const remaining = Math.max(0, (b.total_amount || 0) - (b.advance_paid || 0))
+                const remaining = b.status === 'fully_completed' ? 0 : Math.max(0, (b.total_amount || 0) - (b.advance_paid || 0))
                 const isCompleted = b.status === 'completed'
                 const isCancelled = b.status === 'cancelled'
                 const isPending = b.status === 'pending_verification'
@@ -452,7 +452,7 @@ export default function Dashboard() {
                     )}
 
                     {/* In progress — balance due after delivery */}
-                    {!isCompleted && !isCancelled && !isPending && !isPendingFinal && remaining > 0 && (
+                    {!isCompleted && !isCancelled && !isPending && !isPendingFinal && b.status !== 'fully_completed' && remaining > 0 && (
                       <div className="mt-3 rounded-xl px-4 py-2.5 flex items-center justify-between gap-2 bg-orange-50 border border-orange-200 text-sm">
                         <div className="flex items-center gap-2">
                           <AlertCircle size={15} className="text-orange-500" />
