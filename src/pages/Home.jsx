@@ -120,7 +120,7 @@ export default function Home() {
           <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1920&q=80"
             alt="" className="w-full h-full object-cover" />
           <div className="absolute inset-0"
-            style={{ background: 'linear-gradient(135deg, rgba(10,15,46,0.93) 0%, rgba(13,20,66,0.88) 40%, rgba(26,41,128,0.80) 100%)' }} />
+            style={{ background: 'linear-gradient(135deg, rgba(10,15,46,0.70) 0%, rgba(13,20,66,0.65) 40%, rgba(26,41,128,0.55) 100%)' }} />
         </div>
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-20 left-10 w-80 h-80 rounded-full blur-3xl opacity-20"
@@ -130,21 +130,21 @@ export default function Home() {
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
           <div className="max-w-3xl">
-            <div className="reveal inline-flex items-center gap-2 border border-white/20 rounded-full px-4 py-2 mb-6"
+            <div className="inline-flex items-center gap-2 border border-white/20 rounded-full px-4 py-2 mb-6"
               style={{ background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(8px)' }}>
               <Zap size={14} className="text-yellow-400" />
               <span className="text-white/80 text-sm font-medium">Smart Digital Solutions</span>
             </div>
-            <h1 className="reveal reveal-delay-1 text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-tight mb-4">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-tight mb-4">
               ASLEN<br />
               <span style={{ background: 'linear-gradient(90deg, #60a5fa, #a78bfa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                 TECH SOLUTIONS
               </span>
             </h1>
-            <p className="reveal reveal-delay-2 text-xl mb-8 leading-relaxed" style={{ color: 'rgba(255,255,255,0.65)' }}>
+            <p className="text-xl mb-8 leading-relaxed" style={{ color: 'rgba(255,255,255,0.65)' }}>
               Empowering Businesses with Smart Digital Solutions
             </p>
-            <div className="reveal reveal-delay-3 flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-4">
               <a href="#services" className="btn-navy px-8 py-4 rounded-xl font-bold text-lg flex items-center gap-2">
                 Explore Services <ArrowRight size={20} />
               </a>
@@ -155,7 +155,7 @@ export default function Home() {
                 Contact Us
               </a>
             </div>
-            <div className="reveal reveal-delay-4 flex flex-wrap gap-10 mt-14">
+            <div className="flex flex-wrap gap-10 mt-14">
               {[['50+', 'Projects Done'], ['100%', 'Client Satisfaction'], ['24/7', 'Support']].map(([val, label]) => (
                 <div key={label}>
                   <div className="text-3xl font-black text-white">{val}</div>
@@ -172,7 +172,7 @@ export default function Home() {
         <div className="absolute inset-0">
           <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=1920&q=80"
             alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0" style={{ background: 'rgba(255,255,255,0.94)' }} />
+          <div className="absolute inset-0" style={{ background: 'rgba(255,255,255,0.75)' }} />
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="reveal text-center mb-14">
@@ -197,7 +197,7 @@ export default function Home() {
         <div className="absolute inset-0">
           <img src="https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=1920&q=80"
             alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0" style={{ background: 'rgba(240,244,255,0.93)' }} />
+          <div className="absolute inset-0" style={{ background: 'rgba(240,244,255,0.75)' }} />
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="reveal text-center mb-14">
@@ -220,7 +220,7 @@ export default function Home() {
         <div className="absolute inset-0">
           <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1920&q=80"
             alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0" style={{ background: 'rgba(13,20,66,0.88)' }} />
+          <div className="absolute inset-0" style={{ background: 'rgba(13,20,66,0.65)' }} />
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
@@ -271,7 +271,7 @@ export default function Home() {
         <div className="absolute inset-0">
           <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=1920&q=80"
             alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0" style={{ background: 'rgba(255,255,255,0.95)' }} />
+          <div className="absolute inset-0" style={{ background: 'rgba(255,255,255,0.78)' }} />
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="reveal text-center mb-12">
@@ -331,7 +331,7 @@ export default function Home() {
         <div className="absolute inset-0">
           <img src="https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=1920&q=80"
             alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0" style={{ background: 'rgba(10,15,46,0.88)' }} />
+          <div className="absolute inset-0" style={{ background: 'rgba(10,15,46,0.65)' }} />
         </div>
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="reveal text-center mb-12">

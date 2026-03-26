@@ -10,12 +10,18 @@ export function useScrollReveal() {
           }
         })
       },
-      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+      { threshold: 0.08, rootMargin: '0px 0px -20px 0px' }
     )
 
-    const elements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right')
-    elements.forEach((el) => observer.observe(el))
+    // Small delay ensures React has fully painted the DOM
+    const timer = setTimeout(() => {
+      const elements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right')
+      elements.forEach((el) => observer.observe(el))
+    }, 50)
 
-    return () => observer.disconnect()
+    return () => {
+      clearTimeout(timer)
+      observer.disconnect()
+    }
   }, [])
 }

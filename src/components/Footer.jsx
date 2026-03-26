@@ -36,11 +36,11 @@ export default function Footer() {
             <ul className="space-y-3 text-sm">
               <li className="flex items-center gap-2">
                 <Mail size={15} className="text-blue-400 shrink-0" />
-                <span>contact@aslentech.com</span>
+                <span>sailendrakondapalli@gmail.com</span>
               </li>
               <li className="flex items-center gap-2">
                 <Phone size={15} className="text-blue-400 shrink-0" />
-                <span>+91 98765 43210</span>
+                <span>+91 8143724405</span>
               </li>
               <li className="flex items-center gap-2">
                 <MapPin size={15} className="text-blue-400 shrink-0" />
@@ -48,7 +48,7 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-2">
                 <Globe size={15} className="text-blue-400 shrink-0" />
-                <span>www.aslentech.com</span>
+                <span>www.aslen.in</span>
               </li>
             </ul>
           </div>

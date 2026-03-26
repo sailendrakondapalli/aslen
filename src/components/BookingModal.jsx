@@ -303,18 +303,10 @@ export default function BookingModal({ service, onClose }) {
         {/* QR Code */}
         <div className="flex flex-col items-center gap-3 bg-white border-2 border-dashed border-blue-200 rounded-2xl p-6">
           <img
-            src="/payment-qr.png"
+            src="/qr.png"
             alt="Payment QR Code"
             className="w-48 h-48 object-contain rounded-xl"
-            onError={(e) => {
-              e.target.style.display = 'none'
-              e.target.nextSibling.style.display = 'flex'
-            }}
           />
-          <div className="w-48 h-48 bg-gray-100 rounded-xl items-center justify-center text-gray-400 text-xs text-center p-4 hidden">
-            <QrCode size={40} className="mb-2 mx-auto" />
-            Add your QR image at<br /><code>public/payment-qr.png</code>
-          </div>
           <p className="text-xs text-gray-500 text-center">
             Scan with PhonePe, GPay, Paytm, or any UPI app
           </p>
