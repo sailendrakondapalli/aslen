@@ -103,6 +103,13 @@ export default function BookingModal({ service, onClose }) {
     if (!screenshot) { toast.error('Please upload your payment screenshot'); return }
     setLoading(true)
     try {
+      // 0. Ensure user exists in public.users (avoids FK violation)
+      await supabase.from('users').upsert({
+        id: user.id,
+        email: user.email,
+        name: user.user_metadata?.full_name || user.user_metadata?.name || '',
+        profile_url: user.user_metadata?.avatar_url || '',
+      }, { onConflict: 'id' })
       // 1. Upload screenshot to Supabase Storage
       const ext  = screenshot.name.split('.').pop()
       const path = `${user.id}/${Date.now()}.${ext}`

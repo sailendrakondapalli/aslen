@@ -6,9 +6,10 @@ import { ADMIN_EMAILS } from '../data/services'
 import { Loader2, Clock, IndianRupee, Users, ShoppingBag, Image, X, Star } from 'lucide-react'
 import toast from 'react-hot-toast'
 
-const STATUS_OPTIONS = ['confirmed', 'in_progress', 'completed', 'cancelled']
+const STATUS_OPTIONS = ['pending_verification', 'confirmed', 'in_progress', 'completed', 'cancelled']
 
 const statusColor = {
+  pending_verification: 'bg-orange-100 text-orange-700',
   confirmed: 'bg-blue-100 text-blue-700',
   in_progress: 'bg-yellow-100 text-yellow-700',
   completed: 'bg-green-100 text-green-700',
@@ -40,7 +41,7 @@ export default function AdminDashboard() {
   const fetchAll = async () => {
     setLoading(true)
     const [{ data: b }, { data: u }, { data: f }] = await Promise.all([
-      supabase.from('bookings').select('*').order('created_at', { ascending: false }),
+      supabase.from('bookings').select('*, users(name, email, profile_url)').order('created_at', { ascending: false }),
       supabase.from('users').select('*').order('created_at', { ascending: false }),
       supabase.from('feedback').select('*').order('created_at', { ascending: false }),
     ])
@@ -132,7 +133,19 @@ export default function AdminDashboard() {
                   <tbody className="divide-y divide-gray-50">
                     {bookings.map((b) => (
                       <tr key={b.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap">{b.user_email || b.user_id?.slice(0, 8)}</td>
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          <div className="flex items-center gap-2">
+                            <img
+                              src={b.users?.profile_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(b.users?.name || b.user_email || 'U')}&background=3b82f6&color=fff`}
+                              alt=""
+                              className="w-8 h-8 rounded-full object-cover shrink-0"
+                            />
+                            <div>
+                              <p className="font-semibold text-gray-900 text-xs">{b.users?.name || '—'}</p>
+                              <p className="text-gray-400 text-xs">{b.user_email || b.user_id?.slice(0, 8)}</p>
+                            </div>
+                          </div>
+                        </td>
                         <td className="px-4 py-3 text-gray-700 whitespace-nowrap">{b.service_title}</td>
                         <td className="px-4 py-3 text-gray-600 whitespace-nowrap">{b.package_name}</td>
                         <td className="px-4 py-3 text-green-600 font-semibold whitespace-nowrap">₹{(b.advance_paid || 0).toLocaleString()}</td>
