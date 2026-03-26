@@ -90,8 +90,8 @@ export default function BookingModal({ service, onClose }) {
     return data
   }
 
-  // Launch Razorpay checkout
-  const handleRazorpayPayment = async () => {
+  // Launch Razorpay checkout with optional pre-selected method
+  const handleRazorpayPayment = async (method = null) => {
     setLoading(true)
     const loaded = await loadRazorpay()
     if (!loaded) {
@@ -102,7 +102,7 @@ export default function BookingModal({ service, onClose }) {
 
     const options = {
       key: RZP_KEY,
-      amount: advanceAmount * 100, // paise
+      amount: advanceAmount * 100,
       currency: 'INR',
       name: 'ASLEN TECH SOLUTIONS',
       description: `${service.serviceTitle} - ${service.name} (Advance)`,
@@ -113,11 +113,13 @@ export default function BookingModal({ service, onClose }) {
         contact: '',
       },
       theme: { color: '#2563eb' },
+      // Pre-select the method if user clicked a specific one
+      ...(method && { method: { [method]: true } }),
       handler: async (response) => {
         try {
-          const booking = await saveBooking(response.razorpay_payment_id, 'razorpay')
+          const booking = await saveBooking(response.razorpay_payment_id, method || 'razorpay')
           toast.success('Payment successful! Booking confirmed.')
-          sendWhatsApp(booking.id, 'Razorpay')
+          sendWhatsApp(booking.id, method || 'Razorpay')
           onClose()
         } catch (err) {
           console.error(err)
@@ -232,41 +234,51 @@ export default function BookingModal({ service, onClose }) {
           <p className="text-xs text-gray-500 mt-1">Secure payment via Razorpay</p>
         </div>
 
-        {/* Payment options info */}
-        <div className="grid grid-cols-2 gap-3">
+        <p className="text-sm font-semibold text-gray-700">Choose how to pay</p>
+
+        <div className="space-y-2">
           {[
-            { label: 'UPI', desc: 'GPay, PhonePe, Paytm', emoji: '📱' },
-            { label: 'Cards', desc: 'Visa, Mastercard, RuPay', emoji: '💳' },
-            { label: 'Net Banking', desc: 'All major banks', emoji: '🏦' },
-            { label: 'Wallets', desc: 'Paytm, Mobikwik & more', emoji: '👛' },
-          ].map(({ label, desc, emoji }) => (
-            <div key={label} className="bg-gray-50 rounded-xl p-3 flex items-center gap-2">
-              <span className="text-xl">{emoji}</span>
-              <div>
-                <p className="text-xs font-semibold text-gray-800">{label}</p>
-                <p className="text-xs text-gray-400">{desc}</p>
+            { id: 'upi',        label: 'UPI',          sub: 'GPay, PhonePe, Paytm, BHIM & all UPI apps', emoji: '📱', rzpMethod: 'upi' },
+            { id: 'card',       label: 'Debit / Credit Card', sub: 'Visa, Mastercard, RuPay, Amex',       emoji: '💳', rzpMethod: 'card' },
+            { id: 'netbanking', label: 'Net Banking',   sub: 'SBI, HDFC, ICICI, Axis & 50+ banks',        emoji: '🏦', rzpMethod: 'netbanking' },
+            { id: 'wallet',     label: 'Wallets',       sub: 'Paytm, Mobikwik, Freecharge & more',        emoji: '👛', rzpMethod: 'wallet' },
+            { id: 'emi',        label: 'EMI',           sub: 'No-cost EMI on select cards',                emoji: '📅', rzpMethod: 'emi' },
+          ].map(({ id, label, sub, emoji, rzpMethod }) => (
+            <button
+              key={id}
+              onClick={() => handleRazorpayPayment(rzpMethod)}
+              disabled={loading}
+              className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition-all text-left disabled:opacity-60"
+            >
+              <span className="text-2xl w-10 text-center">{emoji}</span>
+              <div className="flex-1">
+                <p className="font-semibold text-sm text-gray-900">{label}</p>
+                <p className="text-xs text-gray-400 mt-0.5">{sub}</p>
               </div>
-            </div>
+              <span className="text-gray-300 text-lg">›</span>
+            </button>
           ))}
         </div>
 
+        <button
+          onClick={() => handleRazorpayPayment()}
+          disabled={loading}
+          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-60 flex items-center justify-center gap-2 text-sm"
+        >
+          {loading ? <Loader2 size={16} className="animate-spin" /> : null}
+          {loading ? 'Loading...' : 'Open All Payment Options'}
+        </button>
+
         <div className="flex items-center gap-2 bg-green-50 rounded-xl p-3">
-          <CheckCircle size={16} className="text-green-500 shrink-0" />
-          <p className="text-xs text-green-700">100% secure payment powered by Razorpay. Your card details are never stored.</p>
+          <CheckCircle size={14} className="text-green-500 shrink-0" />
+          <p className="text-xs text-green-700">100% secure · SSL encrypted · Powered by Razorpay</p>
         </div>
       </div>
 
-      <div className="p-6 pt-0 flex gap-3">
+      <div className="p-6 pt-0">
         <button onClick={() => setStep(STEP_DETAILS)}
-          className="flex items-center gap-1 border border-gray-200 text-gray-700 px-4 py-3 rounded-xl font-semibold hover:bg-gray-50 transition-colors">
+          className="flex items-center gap-1 border border-gray-200 text-gray-700 px-4 py-2.5 rounded-xl font-semibold hover:bg-gray-50 transition-colors text-sm">
           <ArrowLeft size={16} /> Back
-        </button>
-        <button
-          onClick={handleRazorpayPayment}
-          disabled={loading}
-          className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-60 flex items-center justify-center gap-2">
-          {loading ? <Loader2 size={18} className="animate-spin" /> : null}
-          {loading ? 'Loading...' : `Pay ₹${advanceAmount.toLocaleString()}`}
         </button>
       </div>
     </>
