@@ -6,13 +6,15 @@ import { ADMIN_EMAILS } from '../data/services'
 import { Loader2, Clock, IndianRupee, Users, ShoppingBag, Image, X, Star } from 'lucide-react'
 import toast from 'react-hot-toast'
 
-const STATUS_OPTIONS = ['pending_verification', 'confirmed', 'in_progress', 'completed', 'cancelled']
+const STATUS_OPTIONS = ['pending_verification', 'confirmed', 'in_progress', 'completed', 'pending_final_verification', 'fully_completed', 'cancelled']
 
 const statusColor = {
   pending_verification: 'bg-orange-100 text-orange-700',
   confirmed: 'bg-blue-100 text-blue-700',
   in_progress: 'bg-yellow-100 text-yellow-700',
   completed: 'bg-green-100 text-green-700',
+  pending_final_verification: 'bg-yellow-100 text-yellow-700',
+  fully_completed: 'bg-emerald-100 text-emerald-700',
   cancelled: 'bg-red-100 text-red-700',
 }
 
@@ -125,7 +127,7 @@ export default function AdminDashboard() {
                 <table className="w-full text-sm">
                   <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
                     <tr>
-                      {['Client', 'Service', 'Package', 'Advance', 'Total', 'Pending', 'Status', 'Screenshot', 'Date'].map(h => (
+                      {['Client', 'Service', 'Package', 'Advance', 'Total', 'Pending', 'Status', 'Screenshot', 'Final SS', 'Date'].map(h => (
                         <th key={h} className="px-4 py-3 text-left font-semibold whitespace-nowrap">{h}</th>
                       ))}
                     </tr>
@@ -169,6 +171,18 @@ export default function AdminDashboard() {
                             <button
                               onClick={() => setLightboxUrl(b.payment_screenshot_url)}
                               className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 font-medium"
+                            >
+                              <Image size={14} /> View
+                            </button>
+                          ) : (
+                            <span className="text-gray-400 text-xs">—</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap">
+                          {b.remaining_screenshot_url ? (
+                            <button
+                              onClick={() => setLightboxUrl(b.remaining_screenshot_url)}
+                              className="flex items-center gap-1 text-xs text-emerald-600 hover:text-emerald-800 font-medium"
                             >
                               <Image size={14} /> View
                             </button>
