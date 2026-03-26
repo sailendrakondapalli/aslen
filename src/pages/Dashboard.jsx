@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { supabase } from '../lib/supabase'
-import { Loader2, CheckCircle, LogOut, LayoutDashboard, AlertCircle, X, Upload, ArrowLeft, Star, Send, PartyPopper } from 'lucide-react'
+import { Loader2, CheckCircle, LogOut, LayoutDashboard, AlertCircle, X, ArrowLeft, Star, Send, PartyPopper } from 'lucide-react'
 import { ADMIN_EMAILS } from '../data/services'
 import toast from 'react-hot-toast'
 
@@ -142,64 +142,85 @@ function ThankYouModal({ booking, onClose }) {
 }
 
 // ── Remaining Payment Modal ──────────────────────────────────────────────────
+function loadRazorpay() {
+  return new Promise((resolve) => {
+    if (window.Razorpay) { resolve(true); return }
+    const script = document.createElement('script')
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+    script.onload = () => resolve(true)
+    script.onerror = () => resolve(false)
+    document.body.appendChild(script)
+  })
+}
+
+const RZP_KEY = import.meta.env.VITE_RAZORPAY_KEY_ID
+
 function RemainingPayModal({ booking, onClose, onSuccess }) {
   const { user } = useAuthStore()
-  const [screenshot, setScreenshot] = useState(null)
-  const [preview, setPreview] = useState(null)
   const [loading, setLoading] = useState(false)
   const remaining = Math.max(0, (booking.total_amount || 0) - (booking.advance_paid || 0))
 
-  const handleFile = (e) => {
-    const file = e.target.files[0]
-    if (!file) return
-    if (file.size > 5 * 1024 * 1024) { toast.error('File too large (max 5MB)'); return }
-    setScreenshot(file)
-    setPreview(URL.createObjectURL(file))
-  }
-
-  const handleSubmit = async () => {
-    if (!screenshot) { toast.error('Please upload your payment screenshot'); return }
+  const handlePay = async () => {
     setLoading(true)
-    try {
-      const ext = screenshot.name.split('.').pop()
-      const path = `${user.id}/remaining-${Date.now()}.${ext}`
-      const { error: uploadError } = await supabase.storage
-        .from('payment-screenshots')
-        .upload(path, screenshot, { contentType: screenshot.type })
-      if (uploadError) throw uploadError
-
-      const { data: urlData } = supabase.storage.from('payment-screenshots').getPublicUrl(path)
-
-      console.log('Updating booking id:', booking.id, 'with url:', urlData.publicUrl)
-      const { error, data: updateData } = await supabase.from('bookings').update({
-        remaining_screenshot_url: urlData.publicUrl,
-        status: 'pending_final_verification',
-      }).eq('id', booking.id).select()
-      if (error) {
-        console.error('Supabase update error:', error)
-        throw new Error(error.message)
-      }
-      console.log('Updated booking:', updateData)
-
-      toast.success('Payment submitted! Admin will verify shortly.')
-      onSuccess()
-      onClose()
-    } catch (err) {
-      toast.error('Something went wrong. Please try again.')
-      console.error(err)
-    } finally {
+    const loaded = await loadRazorpay()
+    if (!loaded) {
+      toast.error('Payment gateway failed to load.')
       setLoading(false)
+      return
     }
+
+    const options = {
+      key: RZP_KEY,
+      amount: remaining * 100,
+      currency: 'INR',
+      name: 'ASLEN TECH SOLUTIONS',
+      description: `${booking.service_title} - Final Payment`,
+      image: '/favicon.svg',
+      prefill: {
+        name: user.user_metadata?.full_name || '',
+        email: user.email,
+        contact: '',
+      },
+      theme: { color: '#16a34a' },
+      handler: async (response) => {
+        try {
+          console.log('Updating booking id:', booking.id)
+          const { error, data: updateData } = await supabase.from('bookings').update({
+            razorpay_final_payment_id: response.razorpay_payment_id,
+            status: 'pending_final_verification',
+          }).eq('id', booking.id).select()
+          if (error) {
+            console.error('Supabase update error:', error)
+            throw new Error(error.message)
+          }
+          console.log('Updated booking:', updateData)
+          toast.success('Final payment successful! Admin will confirm shortly.')
+          onSuccess()
+          onClose()
+        } catch (err) {
+          toast.error('Payment done but update failed. Contact support.')
+          console.error(err)
+        }
+      },
+      modal: { ondismiss: () => setLoading(false) }
+    }
+
+    const rzp = new window.Razorpay(options)
+    rzp.on('payment.failed', (r) => {
+      toast.error(`Payment failed: ${r.error.description}`)
+      setLoading(false)
+    })
+    rzp.open()
+    setLoading(false)
   }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-100 sticky top-0 bg-white rounded-t-2xl z-10">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
+        <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <div>
             <h2 className="text-xl font-bold text-gray-900">Pay Remaining Balance</h2>
-            <p className="text-sm text-gray-500 mt-0.5">{booking.service_title} — {booking.package_name}</p>
+            <p className="text-sm text-gray-500 mt-0.5">{booking.service_title}</p>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
             <X size={20} />
@@ -207,50 +228,29 @@ function RemainingPayModal({ booking, onClose, onSuccess }) {
         </div>
 
         <div className="p-6 space-y-4">
-          {/* Amount */}
           <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
             <p className="text-sm text-red-600 font-medium">Amount to Pay</p>
             <p className="text-3xl font-black text-red-700 mt-1">₹{remaining.toLocaleString()}</p>
             <p className="text-xs text-red-500 mt-1">Final payment after work delivery</p>
           </div>
 
-          {/* QR */}
-          <div className="flex flex-col items-center gap-3 bg-white border-2 border-dashed border-blue-200 rounded-2xl p-6">
-            <img src="/qr.png" alt="Payment QR" className="w-48 h-48 object-contain rounded-xl" />
-            <p className="text-xs text-gray-500 text-center">Scan with PhonePe, GPay, Paytm, or any UPI app</p>
-            <div className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 flex items-center justify-between gap-2">
-              <div>
-                <p className="text-xs text-gray-400 mb-0.5">UPI ID</p>
-                <p className="text-sm font-bold text-gray-800 font-mono">8143724405-2@ibl</p>
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { label: 'UPI', emoji: '📱' },
+              { label: 'Cards', emoji: '💳' },
+              { label: 'Net Banking', emoji: '🏦' },
+              { label: 'Wallets', emoji: '👛' },
+            ].map(({ label, emoji }) => (
+              <div key={label} className="bg-gray-50 rounded-xl p-2 flex items-center gap-2">
+                <span>{emoji}</span>
+                <p className="text-xs font-semibold text-gray-700">{label}</p>
               </div>
-              <button
-                onClick={() => { navigator.clipboard.writeText('8143724405-2@ibl'); toast.success('UPI ID copied!') }}
-                className="text-xs bg-blue-100 text-blue-600 hover:bg-blue-200 px-3 py-1.5 rounded-lg font-semibold transition-colors shrink-0"
-              >
-                Copy
-              </button>
-            </div>
+            ))}
           </div>
 
-          {/* Screenshot upload */}
-          <div>
-            <p className="text-sm font-medium text-gray-700 mb-2">Upload payment screenshot</p>
-            <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-colors
-              ${preview ? 'border-green-400 bg-green-50' : 'border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-blue-50'}`}>
-              {preview ? (
-                <div className="flex flex-col items-center gap-2">
-                  <img src={preview} alt="preview" className="h-20 object-contain rounded-lg" />
-                  <p className="text-xs text-green-600 font-medium">Screenshot selected ✓</p>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center gap-2 text-gray-400">
-                  <Upload size={24} />
-                  <p className="text-sm">Click to upload screenshot</p>
-                  <p className="text-xs">PNG, JPG up to 5MB</p>
-                </div>
-              )}
-              <input type="file" accept="image/*" className="hidden" onChange={handleFile} />
-            </label>
+          <div className="flex items-center gap-2 bg-green-50 rounded-xl p-3">
+            <CheckCircle size={14} className="text-green-500 shrink-0" />
+            <p className="text-xs text-green-700">Secure payment via Razorpay</p>
           </div>
         </div>
 
@@ -259,12 +259,10 @@ function RemainingPayModal({ booking, onClose, onSuccess }) {
             className="flex items-center gap-1 border border-gray-200 text-gray-700 px-4 py-3 rounded-xl font-semibold hover:bg-gray-50 transition-colors">
             <ArrowLeft size={16} /> Back
           </button>
-          <button
-            onClick={handleSubmit}
-            disabled={loading || !screenshot}
-            className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-60 flex items-center justify-center gap-2">
-            {loading ? <Loader2 size={18} className="animate-spin" /> : <CheckCircle size={18} />}
-            {loading ? 'Submitting...' : 'Confirm Payment'}
+          <button onClick={handlePay} disabled={loading}
+            className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-xl font-bold hover:opacity-90 disabled:opacity-60 flex items-center justify-center gap-2">
+            {loading ? <Loader2 size={18} className="animate-spin" /> : null}
+            {loading ? 'Loading...' : `Pay ₹${remaining.toLocaleString()}`}
           </button>
         </div>
       </div>

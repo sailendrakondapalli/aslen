@@ -1,49 +1,26 @@
 import { useState } from 'react'
-import { X, Loader2, MessageCircle, QrCode, CreditCard, Building2, Smartphone, Upload, CheckCircle, ArrowLeft } from 'lucide-react'
+import { X, Loader2, MessageCircle, CheckCircle, ArrowLeft } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../store/authStore'
 import { WHATSAPP_NUMBER } from '../data/services'
 import toast from 'react-hot-toast'
 
-// ── Payment methods ──────────────────────────────────────────────────────────
-const PAYMENT_METHODS = [
-  {
-    id: 'upi',
-    label: 'UPI / QR Code',
-    icon: QrCode,
-    active: true,
-    description: 'Scan & pay instantly',
-    badge: null,
-  },
-  {
-    id: 'card',
-    label: 'Card / Net Banking',
-    icon: CreditCard,
-    active: false,
-    description: 'Coming soon',
-    badge: 'Soon',
-  },
-  {
-    id: 'bank',
-    label: 'Bank Transfer',
-    icon: Building2,
-    active: false,
-    description: 'Coming soon',
-    badge: 'Soon',
-  },
-  {
-    id: 'wallet',
-    label: 'Wallets',
-    icon: Smartphone,
-    active: false,
-    description: 'Coming soon',
-    badge: 'Soon',
-  },
-]
-
 const STEP_DETAILS = 'details'
 const STEP_PAYMENT = 'payment'
-const STEP_UPLOAD  = 'upload'
+
+const RZP_KEY = import.meta.env.VITE_RAZORPAY_KEY_ID
+
+// Load Razorpay script dynamically
+function loadRazorpay() {
+  return new Promise((resolve) => {
+    if (window.Razorpay) { resolve(true); return }
+    const script = document.createElement('script')
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+    script.onload = () => resolve(true)
+    script.onerror = () => resolve(false)
+    document.body.appendChild(script)
+  })
+}
 
 export default function BookingModal({ service, onClose }) {
   const { user } = useAuthStore()
@@ -51,9 +28,6 @@ export default function BookingModal({ service, onClose }) {
   const [extraPages, setExtraPages] = useState(0)
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState(STEP_DETAILS)
-  const [selectedMethod, setSelectedMethod] = useState('upi')
-  const [screenshot, setScreenshot] = useState(null)
-  const [screenshotPreview, setScreenshotPreview] = useState(null)
 
   const isWebDev      = service.serviceId === 'web-development'
   const isCustom      = service.price === 0
@@ -61,8 +35,7 @@ export default function BookingModal({ service, onClose }) {
   const totalPrice    = service.price + extraCost
   const advanceAmount = service.advance
 
-  // ── WhatsApp notification ────────────────────────────────────────────────
-  const sendWhatsApp = (bookingId) => {
+  const sendWhatsApp = (bookingId, method) => {
     const msg = encodeURIComponent(
       `🔔 *New Booking - ASLEN TECH SOLUTIONS*\n\n` +
       `👤 *Client:* ${user.user_metadata?.full_name || 'User'}\n` +
@@ -70,7 +43,7 @@ export default function BookingModal({ service, onClose }) {
       `🛠️ *Service:* ${service.serviceTitle} - ${service.name}\n` +
       `💰 *Total:* ₹${totalPrice.toLocaleString()}\n` +
       `💳 *Advance:* ₹${advanceAmount.toLocaleString()}\n` +
-      `💳 *Method:* UPI/QR\n` +
+      `💳 *Method:* ${method}\n` +
       `📝 *Notes:* ${description || 'N/A'}\n` +
       `\n_Booking ID: ${bookingId}_`
     )
@@ -89,67 +62,80 @@ export default function BookingModal({ service, onClose }) {
     onClose()
   }
 
-  // ── Screenshot picker ────────────────────────────────────────────────────
-  const handleScreenshotChange = (e) => {
-    const file = e.target.files[0]
-    if (!file) return
-    if (file.size > 5 * 1024 * 1024) { toast.error('File too large (max 5MB)'); return }
-    setScreenshot(file)
-    setScreenshotPreview(URL.createObjectURL(file))
+  // Save booking to Supabase after successful payment
+  const saveBooking = async (paymentId, method) => {
+    await supabase.from('users').upsert({
+      id: user.id,
+      email: user.email,
+      name: user.user_metadata?.full_name || user.user_metadata?.name || '',
+      profile_url: user.user_metadata?.avatar_url || '',
+    }, { onConflict: 'id' })
+
+    const { data, error } = await supabase.from('bookings').insert({
+      user_id: user.id,
+      user_email: user.email,
+      service_id: service.serviceId,
+      service_title: service.serviceTitle,
+      package_name: service.name,
+      payment_method: method,
+      razorpay_payment_id: paymentId,
+      advance_paid: advanceAmount,
+      total_amount: totalPrice,
+      extra_pages: isWebDev ? extraPages : 0,
+      description,
+      status: 'confirmed',
+    }).select().single()
+
+    if (error) throw error
+    return data
   }
 
-  // ── Submit booking with screenshot ──────────────────────────────────────
-  const handleSubmitBooking = async () => {
-    if (!screenshot) { toast.error('Please upload your payment screenshot'); return }
+  // Launch Razorpay checkout
+  const handleRazorpayPayment = async () => {
     setLoading(true)
-    try {
-      // 0. Ensure user exists in public.users (avoids FK violation)
-      await supabase.from('users').upsert({
-        id: user.id,
-        email: user.email,
-        name: user.user_metadata?.full_name || user.user_metadata?.name || '',
-        profile_url: user.user_metadata?.avatar_url || '',
-      }, { onConflict: 'id' })
-      // 1. Upload screenshot to Supabase Storage
-      const ext  = screenshot.name.split('.').pop()
-      const path = `${user.id}/${Date.now()}.${ext}`
-      const { error: uploadError } = await supabase.storage
-        .from('payment-screenshots')
-        .upload(path, screenshot, { contentType: screenshot.type })
-      if (uploadError) throw uploadError
-
-      // 2. Get public URL
-      const { data: urlData } = supabase.storage
-        .from('payment-screenshots')
-        .getPublicUrl(path)
-
-      // 3. Save booking
-      const { data, error } = await supabase.from('bookings').insert({
-        user_id: user.id,
-        user_email: user.email,
-        service_id: service.serviceId,
-        service_title: service.serviceTitle,
-        package_name: service.name,
-        payment_method: 'upi',
-        payment_screenshot_url: urlData.publicUrl,
-        advance_paid: advanceAmount,
-        total_amount: totalPrice,
-        extra_pages: isWebDev ? extraPages : 0,
-        description,
-        status: 'pending_verification',
-      }).select().single()
-
-      if (error) throw error
-
-      toast.success('Booking submitted! We will verify your payment shortly.')
-      sendWhatsApp(data.id)
-      onClose()
-    } catch (err) {
-      toast.error('Something went wrong. Please try again.')
-      console.error(err)
-    } finally {
+    const loaded = await loadRazorpay()
+    if (!loaded) {
+      toast.error('Payment gateway failed to load. Check your connection.')
       setLoading(false)
+      return
     }
+
+    const options = {
+      key: RZP_KEY,
+      amount: advanceAmount * 100, // paise
+      currency: 'INR',
+      name: 'ASLEN TECH SOLUTIONS',
+      description: `${service.serviceTitle} - ${service.name} (Advance)`,
+      image: '/favicon.svg',
+      prefill: {
+        name: user.user_metadata?.full_name || user.user_metadata?.name || '',
+        email: user.email,
+        contact: '',
+      },
+      theme: { color: '#2563eb' },
+      handler: async (response) => {
+        try {
+          const booking = await saveBooking(response.razorpay_payment_id, 'razorpay')
+          toast.success('Payment successful! Booking confirmed.')
+          sendWhatsApp(booking.id, 'Razorpay')
+          onClose()
+        } catch (err) {
+          console.error(err)
+          toast.error('Payment done but booking save failed. Contact support.')
+        }
+      },
+      modal: {
+        ondismiss: () => { setLoading(false) }
+      }
+    }
+
+    const rzp = new window.Razorpay(options)
+    rzp.on('payment.failed', (response) => {
+      toast.error(`Payment failed: ${response.error.description}`)
+      setLoading(false)
+    })
+    rzp.open()
+    setLoading(false)
   }
 
   // ── Step: Details ────────────────────────────────────────────────────────
@@ -236,52 +222,37 @@ export default function BookingModal({ service, onClose }) {
     </>
   )
 
-  // ── Step: Payment method selection ──────────────────────────────────────
+  // ── Step: Payment ────────────────────────────────────────────────────────
   const renderPayment = () => (
     <>
       <div className="p-6 space-y-4">
-        <div className="bg-blue-50 rounded-xl p-3 flex justify-between text-sm">
-          <span className="text-gray-600">Advance to pay</span>
-          <span className="font-bold text-orange-600">₹{advanceAmount.toLocaleString()}</span>
+        <div className="bg-blue-50 rounded-xl p-4 text-center">
+          <p className="text-sm text-gray-600">Advance to pay now</p>
+          <p className="text-3xl font-black text-orange-600 mt-1">₹{advanceAmount.toLocaleString()}</p>
+          <p className="text-xs text-gray-500 mt-1">Secure payment via Razorpay</p>
         </div>
 
-        <p className="text-sm font-medium text-gray-700">Select payment method</p>
+        {/* Payment options info */}
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            { label: 'UPI', desc: 'GPay, PhonePe, Paytm', emoji: '📱' },
+            { label: 'Cards', desc: 'Visa, Mastercard, RuPay', emoji: '💳' },
+            { label: 'Net Banking', desc: 'All major banks', emoji: '🏦' },
+            { label: 'Wallets', desc: 'Paytm, Mobikwik & more', emoji: '👛' },
+          ].map(({ label, desc, emoji }) => (
+            <div key={label} className="bg-gray-50 rounded-xl p-3 flex items-center gap-2">
+              <span className="text-xl">{emoji}</span>
+              <div>
+                <p className="text-xs font-semibold text-gray-800">{label}</p>
+                <p className="text-xs text-gray-400">{desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
 
-        <div className="space-y-2">
-          {PAYMENT_METHODS.map((method) => {
-            const Icon = method.icon
-            const isSelected = selectedMethod === method.id
-            return (
-              <button
-                key={method.id}
-                onClick={() => method.active && setSelectedMethod(method.id)}
-                disabled={!method.active}
-                className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left
-                  ${method.active ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'}
-                  ${isSelected && method.active ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-white hover:border-gray-300'}
-                `}
-              >
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center
-                  ${isSelected && method.active ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-500'}`}>
-                  <Icon size={20} />
-                </div>
-                <div className="flex-1">
-                  <p className={`font-semibold text-sm ${isSelected && method.active ? 'text-blue-700' : 'text-gray-800'}`}>
-                    {method.label}
-                  </p>
-                  <p className="text-xs text-gray-500">{method.description}</p>
-                </div>
-                {method.badge && (
-                  <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full font-medium">
-                    {method.badge}
-                  </span>
-                )}
-                {isSelected && method.active && (
-                  <CheckCircle size={18} className="text-blue-500 shrink-0" />
-                )}
-              </button>
-            )
-          })}
+        <div className="flex items-center gap-2 bg-green-50 rounded-xl p-3">
+          <CheckCircle size={16} className="text-green-500 shrink-0" />
+          <p className="text-xs text-green-700">100% secure payment powered by Razorpay. Your card details are never stored.</p>
         </div>
       </div>
 
@@ -290,109 +261,34 @@ export default function BookingModal({ service, onClose }) {
           className="flex items-center gap-1 border border-gray-200 text-gray-700 px-4 py-3 rounded-xl font-semibold hover:bg-gray-50 transition-colors">
           <ArrowLeft size={16} /> Back
         </button>
-        <button onClick={() => setStep(STEP_UPLOAD)}
-          className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold hover:opacity-90 transition-opacity">
-          Pay via QR →
-        </button>
-      </div>
-    </>
-  )
-
-  // ── Step: QR + screenshot upload ─────────────────────────────────────────
-  const renderUpload = () => (
-    <>
-      <div className="p-6 space-y-4">
-        <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 text-center">
-          <p className="text-sm font-bold text-orange-700">Pay ₹{advanceAmount.toLocaleString()} advance</p>
-          <p className="text-xs text-orange-600 mt-0.5">Scan the QR below using any UPI app</p>
-        </div>
-
-        {/* QR Code */}
-        <div className="flex flex-col items-center gap-3 bg-white border-2 border-dashed border-blue-200 rounded-2xl p-6">
-          <img
-            src="/qr.png"
-            alt="Payment QR Code"
-            className="w-48 h-48 object-contain rounded-xl"
-          />
-          <p className="text-xs text-gray-500 text-center">
-            Scan with PhonePe, GPay, Paytm, or any UPI app
-          </p>
-          {/* UPI ID */}
-          <div className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 flex items-center justify-between gap-2">
-            <div>
-              <p className="text-xs text-gray-400 mb-0.5">UPI ID</p>
-              <p className="text-sm font-bold text-gray-800 font-mono">8143724405-2@ibl</p>
-            </div>
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText('8143724405-2@ibl')
-                toast.success('UPI ID copied!')
-              }}
-              className="text-xs bg-blue-100 text-blue-600 hover:bg-blue-200 px-3 py-1.5 rounded-lg font-semibold transition-colors shrink-0"
-            >
-              Copy
-            </button>
-          </div>
-        </div>
-
-        {/* Screenshot upload */}
-        <div>
-          <p className="text-sm font-medium text-gray-700 mb-2">Upload payment screenshot</p>
-          <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-colors
-            ${screenshotPreview ? 'border-green-400 bg-green-50' : 'border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-blue-50'}`}>
-            {screenshotPreview ? (
-              <div className="flex flex-col items-center gap-2">
-                <img src={screenshotPreview} alt="preview" className="h-20 object-contain rounded-lg" />
-                <p className="text-xs text-green-600 font-medium">Screenshot selected ✓</p>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center gap-2 text-gray-400">
-                <Upload size={24} />
-                <p className="text-sm">Click to upload screenshot</p>
-                <p className="text-xs">PNG, JPG up to 5MB</p>
-              </div>
-            )}
-            <input type="file" accept="image/*" className="hidden" onChange={handleScreenshotChange} />
-          </label>
-        </div>
-      </div>
-
-      <div className="p-6 pt-0 flex gap-3">
-        <button onClick={() => setStep(STEP_PAYMENT)}
-          className="flex items-center gap-1 border border-gray-200 text-gray-700 px-4 py-3 rounded-xl font-semibold hover:bg-gray-50 transition-colors">
-          <ArrowLeft size={16} /> Back
-        </button>
         <button
-          onClick={handleSubmitBooking}
-          disabled={loading || !screenshot}
-          className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-60 flex items-center justify-center gap-2">
-          {loading ? <Loader2 size={18} className="animate-spin" /> : <CheckCircle size={18} />}
-          {loading ? 'Submitting...' : 'Confirm Booking'}
+          onClick={handleRazorpayPayment}
+          disabled={loading}
+          className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-60 flex items-center justify-center gap-2">
+          {loading ? <Loader2 size={18} className="animate-spin" /> : null}
+          {loading ? 'Loading...' : `Pay ₹${advanceAmount.toLocaleString()}`}
         </button>
       </div>
     </>
   )
 
-  // ── Render ───────────────────────────────────────────────────────────────
   const stepTitle = {
     [STEP_DETAILS]: isCustom ? 'Send Enquiry' : 'Book Service',
-    [STEP_PAYMENT]: 'Choose Payment',
-    [STEP_UPLOAD]:  'Complete Payment',
+    [STEP_PAYMENT]: 'Complete Payment',
   }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-        {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-100 sticky top-0 bg-white rounded-t-2xl z-10">
           <div>
             <h2 className="text-xl font-bold text-gray-900">{stepTitle[step]}</h2>
             {!isCustom && (
               <div className="flex gap-1 mt-1">
-                {[STEP_DETAILS, STEP_PAYMENT, STEP_UPLOAD].map((s, i) => (
+                {[STEP_DETAILS, STEP_PAYMENT].map((s, i) => (
                   <div key={s} className={`h-1 rounded-full transition-all ${
                     step === s ? 'w-6 bg-blue-500' :
-                    [STEP_DETAILS, STEP_PAYMENT, STEP_UPLOAD].indexOf(step) > i ? 'w-4 bg-blue-300' : 'w-4 bg-gray-200'
+                    [STEP_DETAILS, STEP_PAYMENT].indexOf(step) > i ? 'w-4 bg-blue-300' : 'w-4 bg-gray-200'
                   }`} />
                 ))}
               </div>
@@ -405,7 +301,6 @@ export default function BookingModal({ service, onClose }) {
 
         {step === STEP_DETAILS && renderDetails()}
         {step === STEP_PAYMENT && renderPayment()}
-        {step === STEP_UPLOAD  && renderUpload()}
       </div>
     </div>
   )
