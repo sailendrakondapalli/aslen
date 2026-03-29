@@ -42,10 +42,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg, #1a2980, #1d4ed8)' }}>
-              <span className="text-white font-black text-sm">A</span>
-            </div>
+            <img src="/logo.png" alt="ASLEN TECH SOLUTIONS" className="h-9 w-9 rounded-full object-cover" />
             <span className="text-white font-black text-base tracking-wide">ASLEN TECH</span>
           </Link>
 

@@ -9,9 +9,7 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #0d1442, #1a2980)' }}>
-                <span className="text-white font-black text-sm">A</span>
-              </div>
+              <img src="/logo.png" alt="ASLEN TECH SOLUTIONS" className="h-10 w-10 rounded-full object-cover" />
               <span className="text-white font-black text-lg">ASLEN TECH SOLUTIONS</span>
             </div>
             <p className="text-sm text-gray-400 leading-relaxed">
