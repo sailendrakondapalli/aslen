@@ -15,7 +15,7 @@ export default function CancellationPolicy() {
           </section>
           <section>
             <h2 className="text-lg font-bold text-gray-900 mb-2">How to Cancel</h2>
-            <p>To request a cancellation before work begins, contact us at <a href="mailto:sailendrakondapalli@gmail.com" className="text-blue-600 hover:underline">sailendrakondapalli@gmail.com</a> or WhatsApp us at +91 81437 24405.</p>
+            <p>To request a cancellation before work begins, contact us at <a href="mailto:sailendrakondapalli@gmail.com" className="text-[#222222] hover:underline">sailendrakondapalli@gmail.com</a> or WhatsApp us at +91 81437 24405.</p>
           </section>
         </div>
       </div>

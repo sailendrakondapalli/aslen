@@ -8,7 +8,7 @@ import toast from 'react-hot-toast'
 
 const statusColor = {
   pending_verification: 'bg-orange-100 text-orange-700',
-  confirmed: 'bg-blue-100 text-blue-700',
+  confirmed: 'bg-[#e8e8e8] text-[#222222]',
   in_progress: 'bg-yellow-100 text-yellow-700',
   completed: 'bg-green-100 text-green-700',
   pending_final_verification: 'bg-yellow-100 text-yellow-700',
@@ -61,74 +61,57 @@ function ThankYouModal({ booking, onClose }) {
     setLoading(true)
     try {
       const { error } = await supabase.from('feedback').insert({
-        user_id: user.id,
-        user_email: user.email,
-        name: userName,
-        avatar_url: userAvatar,
-        rating,
-        comment: comment.trim(),
+        user_id: user.id, user_email: user.email,
+        name: userName, avatar_url: userAvatar, rating, comment: comment.trim(),
       })
       if (error) throw error
       setSubmitted(true)
-    } catch (err) {
-      toast.error('Failed to submit. Please try again.')
-    } finally {
-      setLoading(false)
-    }
+    } catch { toast.error('Failed to submit. Please try again.') }
+    finally { setLoading(false) }
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" style={{ fontFamily: 'Poppins, sans-serif' }}>
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
         {submitted ? (
           <div className="p-8 text-center space-y-4">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-              <CheckCircle size={32} className="text-green-500" />
+            <div className="w-16 h-16 bg-[#f5f5f5] rounded-full flex items-center justify-center mx-auto">
+              <CheckCircle size={32} className="text-[#222222]" />
             </div>
-            <h2 className="text-2xl font-black text-gray-900">Thank You!</h2>
-            <p className="text-gray-500">Your feedback means a lot to us.</p>
+            <h2 className="text-2xl font-black text-[#1e293b]">Thank You!</h2>
+            <p className="text-[#64748b]">Your feedback means a lot to us.</p>
             <button onClick={onClose}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold hover:opacity-90 transition-opacity">
+              className="w-full bg-[#222222] hover:bg-[#111111] text-white py-3 rounded-xl font-bold transition-colors">
               Close
             </button>
           </div>
         ) : (
           <>
-            {/* Thank you header */}
-            <div className="bg-gradient-to-r from-emerald-500 to-green-600 p-6 text-center text-white">
-              <PartyPopper size={36} className="mx-auto mb-2" />
+            <div className="bg-[#222222] p-6 text-center text-white">
+              <PartyPopper size={36} className="mx-auto mb-2 text-[#f59e0b]" />
               <h2 className="text-2xl font-black">Project Completed!</h2>
-              <p className="text-white/80 text-sm mt-1">Thank you for choosing ASLEN TECH SOLUTIONS</p>
-              <p className="text-white/70 text-xs mt-1">{booking.service_title} — {booking.package_name}</p>
+              <p className="text-white/70 text-sm mt-1">Thank you for choosing ASLEN TECH SOLUTIONS</p>
+              <p className="text-white/50 text-xs mt-1">{booking.service_title} — {booking.package_name}</p>
             </div>
-
             <div className="p-6 space-y-5">
               <div className="text-center">
-                <p className="text-gray-700 font-semibold mb-1">How was your experience?</p>
-                <p className="text-gray-400 text-sm mb-4">Rate us and share your feedback</p>
+                <p className="text-[#1e293b] font-semibold mb-1">How was your experience?</p>
+                <p className="text-[#94a3b8] text-sm mb-4">Rate us and share your feedback</p>
                 <StarRating value={rating} onChange={setRating} />
                 {rating > 0 && (
-                  <p className="text-sm text-gray-500 mt-2">
-                    {['','Poor','Fair','Good','Very Good','Excellent'][rating]}
-                  </p>
+                  <p className="text-sm text-[#64748b] mt-2">{['','Poor','Fair','Good','Very Good','Excellent'][rating]}</p>
                 )}
               </div>
-
-              <textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                rows={3}
+              <textarea value={comment} onChange={(e) => setComment(e.target.value)} rows={3}
                 placeholder="Tell us about your experience..."
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-              />
-
+                className="w-full border border-[#e2e8f0] rounded-xl px-4 py-3 text-sm text-[#1e293b] resize-none" />
               <div className="flex gap-3">
                 <button onClick={onClose}
-                  className="flex-1 border border-gray-200 text-gray-600 py-3 rounded-xl font-semibold hover:bg-gray-50 transition-colors text-sm">
+                  className="flex-1 border border-[#e2e8f0] text-[#64748b] py-3 rounded-xl font-semibold hover:bg-[#f5f5f5] transition-colors text-sm">
                   Skip
                 </button>
                 <button onClick={handleSubmit} disabled={loading}
-                  className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-60 flex items-center justify-center gap-2">
+                  className="flex-1 bg-[#222222] hover:bg-[#111111] text-white py-3 rounded-xl font-bold transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
                   {loading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
                   Submit
                 </button>
@@ -163,11 +146,7 @@ function RemainingPayModal({ booking, onClose, onSuccess }) {
   const handlePay = async () => {
     setLoading(true)
     const loaded = await loadRazorpay()
-    if (!loaded) {
-      toast.error('Payment gateway failed to load.')
-      setLoading(false)
-      return
-    }
+    if (!loaded) { toast.error('Payment gateway failed to load.'); setLoading(false); return }
 
     const options = {
       key: RZP_KEY,
@@ -175,92 +154,69 @@ function RemainingPayModal({ booking, onClose, onSuccess }) {
       currency: 'INR',
       name: 'ASLEN TECH SOLUTIONS',
       description: `${booking.service_title} - Final Payment`,
-      image: '/favicon.svg',
-      prefill: {
-        name: user.user_metadata?.full_name || '',
-        email: user.email,
-        contact: '',
-      },
-      theme: { color: '#16a34a' },
+      image: '/logo.png',
+      prefill: { name: user.user_metadata?.full_name || '', email: user.email, contact: '' },
+      theme: { color: '#222222' },
       handler: async (response) => {
         try {
-          console.log('Updating booking id:', booking.id)
-          const { error, data: updateData } = await supabase.from('bookings').update({
+          const { error } = await supabase.from('bookings').update({
             razorpay_final_payment_id: response.razorpay_payment_id,
             status: 'pending_final_verification',
           }).eq('id', booking.id).select()
-          if (error) {
-            console.error('Supabase update error:', error)
-            throw new Error(error.message)
-          }
-          console.log('Updated booking:', updateData)
+          if (error) throw new Error(error.message)
           toast.success('Final payment successful! Admin will confirm shortly.')
-          onSuccess()
-          onClose()
+          onSuccess(); onClose()
         } catch (err) {
           toast.error('Payment done but update failed. Contact support.')
-          console.error(err)
         }
       },
       modal: { ondismiss: () => setLoading(false) }
     }
 
     const rzp = new window.Razorpay(options)
-    rzp.on('payment.failed', (r) => {
-      toast.error(`Payment failed: ${r.error.description}`)
-      setLoading(false)
-    })
+    rzp.on('payment.failed', (r) => { toast.error(`Payment failed: ${r.error.description}`); setLoading(false) })
     rzp.open()
     setLoading(false)
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" style={{ fontFamily: 'Poppins, sans-serif' }}>
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
-        <div className="flex items-center justify-between p-6 border-b border-gray-100">
+        <div className="flex items-center justify-between p-6 border-b border-[#e2e8f0]">
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Pay Remaining Balance</h2>
-            <p className="text-sm text-gray-500 mt-0.5">{booking.service_title}</p>
+            <h2 className="text-xl font-bold text-[#1e293b]">Pay Remaining Balance</h2>
+            <p className="text-sm text-[#64748b] mt-0.5">{booking.service_title}</p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+          <button onClick={onClose} className="p-2 hover:bg-[#f5f5f5] rounded-lg transition-colors text-[#64748b]">
             <X size={20} />
           </button>
         </div>
-
         <div className="p-6 space-y-4">
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
-            <p className="text-sm text-red-600 font-medium">Amount to Pay</p>
-            <p className="text-3xl font-black text-red-700 mt-1">₹{remaining.toLocaleString()}</p>
-            <p className="text-xs text-red-500 mt-1">Final payment after work delivery</p>
+          <div className="bg-[#f5f5f5] border border-[#222222]/20 rounded-xl p-4 text-center">
+            <p className="text-sm text-[#64748b] font-medium">Amount to Pay</p>
+            <p className="text-3xl font-black text-[#222222] mt-1">₹{remaining.toLocaleString()}</p>
+            <p className="text-xs text-[#94a3b8] mt-1">Final payment after work delivery</p>
           </div>
-
           <div className="grid grid-cols-2 gap-2">
-            {[
-              { label: 'UPI', emoji: '📱' },
-              { label: 'Cards', emoji: '💳' },
-              { label: 'Net Banking', emoji: '🏦' },
-              { label: 'Wallets', emoji: '👛' },
-            ].map(({ label, emoji }) => (
-              <div key={label} className="bg-gray-50 rounded-xl p-2 flex items-center gap-2">
+            {[{ label: 'UPI', emoji: '📱' }, { label: 'Cards', emoji: '💳' }, { label: 'Net Banking', emoji: '🏦' }, { label: 'Wallets', emoji: '👛' }].map(({ label, emoji }) => (
+              <div key={label} className="bg-[#f5f5f5] rounded-xl p-2 flex items-center gap-2">
                 <span>{emoji}</span>
-                <p className="text-xs font-semibold text-gray-700">{label}</p>
+                <p className="text-xs font-semibold text-[#222222]">{label}</p>
               </div>
             ))}
           </div>
-
-          <div className="flex items-center gap-2 bg-green-50 rounded-xl p-3">
-            <CheckCircle size={14} className="text-green-500 shrink-0" />
-            <p className="text-xs text-green-700">Secure payment via Razorpay</p>
+          <div className="flex items-center gap-2 bg-[#f5f5f5] rounded-xl p-3">
+            <CheckCircle size={14} className="text-[#222222] shrink-0" />
+            <p className="text-xs text-[#222222]">Secure payment via Razorpay</p>
           </div>
         </div>
-
         <div className="p-6 pt-0 flex gap-3">
           <button onClick={onClose}
-            className="flex items-center gap-1 border border-gray-200 text-gray-700 px-4 py-3 rounded-xl font-semibold hover:bg-gray-50 transition-colors">
+            className="flex items-center gap-1 border border-[#e2e8f0] text-[#64748b] px-4 py-3 rounded-xl font-semibold hover:bg-[#f5f5f5] transition-colors">
             <ArrowLeft size={16} /> Back
           </button>
           <button onClick={handlePay} disabled={loading}
-            className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-xl font-bold hover:opacity-90 disabled:opacity-60 flex items-center justify-center gap-2">
+            className="flex-1 bg-[#222222] hover:bg-[#111111] text-white py-3 rounded-xl font-bold transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
             {loading ? <Loader2 size={18} className="animate-spin" /> : null}
             {loading ? 'Loading...' : `Pay ₹${remaining.toLocaleString()}`}
           </button>
@@ -277,9 +233,17 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [payingBooking, setPayingBooking] = useState(null)
   const [thankYouBooking, setThankYouBooking] = useState(null)
+  const [profile, setProfile] = useState(null)
   const navigate = useNavigate()
 
   const isAdmin = user && ADMIN_EMAILS.includes(user.email)
+
+  // Fetch profile from public.users to get name for phone-registered users
+  useEffect(() => {
+    if (!user || !supabase) return
+    supabase.from('users').select('name, email, phone, profile_url').eq('id', user.id).single()
+      .then(({ data }) => { if (data) setProfile(data) })
+  }, [user])
 
   const fetchBookings = () => {
     if (!user || !supabase) { setLoading(false); return }
@@ -312,9 +276,11 @@ export default function Dashboard() {
 
   if (!user) return null
 
-  const name = user.user_metadata?.full_name || user.user_metadata?.name || 'User'
-  const avatar = user.user_metadata?.avatar_url ||
+  // Prefer DB profile name (covers phone-registered users), fallback to OAuth metadata
+  const name = profile?.name || user.user_metadata?.full_name || user.user_metadata?.name || 'User'
+  const avatar = profile?.profile_url || user.user_metadata?.avatar_url ||
     `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=3b82f6&color=fff`
+  const displayContact = profile?.phone || user.phone || user.email || ''
 
   const totalSpent = bookings.reduce((s, b) => s + (b.advance_paid || 0), 0)
   const totalRemaining = bookings
@@ -326,23 +292,23 @@ export default function Dashboard() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
         {/* Profile */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-6 text-white mb-8 flex items-center justify-between flex-wrap gap-4">
+        <div className="bg-[#222222] rounded-2xl p-6 text-white mb-8 flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
-            <img src={avatar} alt="avatar" className="w-16 h-16 rounded-full border-4 border-white/30 object-cover" />
+            <img src={avatar} alt="avatar" className="w-16 h-16 rounded-full border-4 border-white/20 object-cover" />
             <div>
               <h1 className="text-2xl font-black">{name}</h1>
-              <p className="text-white/70 text-sm">{user.email}</p>
+              <p className="text-white/60 text-sm">{displayContact}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             {isAdmin && (
               <button onClick={() => navigate('/admin')}
-                className="flex items-center gap-2 bg-white/20 hover:bg-white/30 transition-colors px-4 py-2 rounded-xl text-sm font-semibold">
+                className="flex items-center gap-2 bg-white/15 hover:bg-white/25 transition-colors px-4 py-2 rounded-xl text-sm font-semibold">
                 <LayoutDashboard size={16} /> Admin Panel
               </button>
             )}
             <button onClick={handleSignOut}
-              className="flex items-center gap-2 bg-white/20 hover:bg-white/30 transition-colors px-4 py-2 rounded-xl text-sm font-semibold">
+              className="flex items-center gap-2 bg-white/15 hover:bg-white/25 transition-colors px-4 py-2 rounded-xl text-sm font-semibold">
               <LogOut size={16} /> Sign Out
             </button>
           </div>
@@ -356,28 +322,28 @@ export default function Dashboard() {
             { label: 'Advance Paid', value: `₹${totalSpent.toLocaleString()}` },
             { label: 'Balance Due', value: `₹${totalRemaining.toLocaleString()}` },
           ].map(({ label, value }) => (
-            <div key={label} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-center">
-              <div className="text-2xl font-black text-gray-900">{value}</div>
-              <div className="text-gray-500 text-sm mt-1">{label}</div>
+            <div key={label} className="bg-white rounded-2xl p-5 border border-[#e2e8f0] text-center">
+              <div className="text-2xl font-black text-[#222222]">{value}</div>
+              <div className="text-[#64748b] text-sm mt-1">{label}</div>
             </div>
           ))}
         </div>
 
         {/* Bookings */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="p-6 border-b border-gray-100">
-            <h2 className="text-xl font-bold text-gray-900">My Bookings</h2>
+        <div className="bg-white rounded-2xl border border-[#e2e8f0] overflow-hidden">
+          <div className="p-6 border-b border-[#e2e8f0]">
+            <h2 className="text-xl font-bold text-[#1e293b]">My Bookings</h2>
           </div>
 
           {loading ? (
             <div className="flex items-center justify-center py-16">
-              <Loader2 size={28} className="animate-spin text-blue-600" />
+              <Loader2 size={28} className="animate-spin text-[#222222]" />
             </div>
           ) : bookings.length === 0 ? (
-            <div className="text-center py-16 text-gray-400">
+            <div className="text-center py-16 text-[#94a3b8]">
               <p className="text-lg font-medium">No bookings yet</p>
               <button onClick={() => navigate('/#services')}
-                className="mt-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-xl text-sm font-semibold hover:opacity-90">
+                className="mt-4 bg-[#222222] hover:bg-[#111111] text-white px-6 py-2 rounded-xl text-sm font-semibold transition-colors">
                 Browse Services
               </button>
             </div>
@@ -411,16 +377,15 @@ export default function Dashboard() {
 
                     {/* Remaining balance — completed, needs payment */}
                     {isCompleted && remaining > 0 && (
-                      <div className="mt-3 rounded-xl px-4 py-3 flex items-center justify-between gap-3 bg-red-50 border border-red-200">
+                      <div className="mt-3 rounded-xl px-4 py-3 flex items-center justify-between gap-3 bg-[#fff7ed] border border-[#fed7aa]">
                         <div className="flex items-center gap-2">
-                          <AlertCircle size={15} className="text-red-500 shrink-0" />
-                          <span className="text-red-700 font-semibold text-sm">Work done! Pay remaining balance</span>
+                          <AlertCircle size={15} className="text-[#d97706] shrink-0" />
+                          <span className="text-[#92400e] font-semibold text-sm">Work done! Pay remaining balance</span>
                         </div>
                         <div className="flex items-center gap-3 shrink-0">
-                          <span className="font-bold text-red-600">₹{remaining.toLocaleString()}</span>
-                          <button
-                            onClick={() => setPayingBooking(b)}
-                            className="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors">
+                          <span className="font-bold text-[#d97706]">₹{remaining.toLocaleString()}</span>
+                          <button onClick={() => setPayingBooking(b)}
+                            className="bg-[#222222] hover:bg-[#111111] text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors">
                             Pay Now
                           </button>
                         </div>
@@ -460,18 +425,18 @@ export default function Dashboard() {
                       </div>
                     )}
 
-                    {/* Fully completed — all done */}
+                    {/* Fully completed */}
                     {b.status === 'fully_completed' && (
-                      <div className="mt-3 rounded-xl px-4 py-2 flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-sm text-emerald-700">
-                        <CheckCircle size={15} className="text-emerald-500" />
+                      <div className="mt-3 rounded-xl px-4 py-2 flex items-center gap-2 bg-[#f5f5f5] border border-[#222222]/20 text-sm text-[#222222]">
+                        <CheckCircle size={15} className="text-[#222222]" />
                         <span className="font-semibold">Project fully completed — Thank you for choosing us!</span>
                       </div>
                     )}
 
                     {/* Fully paid */}
                     {!isCancelled && b.status !== 'fully_completed' && remaining === 0 && (
-                      <div className="mt-3 rounded-xl px-4 py-2 flex items-center gap-2 bg-green-50 border border-green-200 text-sm text-green-700">
-                        <CheckCircle size={15} className="text-green-500" />
+                      <div className="mt-3 rounded-xl px-4 py-2 flex items-center gap-2 bg-[#f5f5f5] border border-[#222222]/20 text-sm text-[#222222]">
+                        <CheckCircle size={15} className="text-[#222222]" />
                         <span className="font-semibold">Fully paid — no balance due</span>
                       </div>
                     )}

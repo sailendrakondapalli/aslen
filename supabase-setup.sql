@@ -54,6 +54,8 @@ create table if not exists public.feedback (
 alter table public.bookings add column if not exists payment_method text default 'upi';
 alter table public.bookings add column if not exists payment_screenshot_url text;
 alter table public.bookings add column if not exists user_email text;
+alter table public.users add column if not exists phone text;
+alter table public.users add column if not exists razorpay_payment_id text;
 
 -- ── Enable RLS ───────────────────────────────────────────────────────────────
 

@@ -10,7 +10,7 @@ const STATUS_OPTIONS = ['pending_verification', 'confirmed', 'in_progress', 'com
 
 const statusColor = {
   pending_verification: 'bg-orange-100 text-orange-700',
-  confirmed: 'bg-blue-100 text-blue-700',
+  confirmed: 'bg-[#e8e8e8] text-[#222222]',
   in_progress: 'bg-yellow-100 text-yellow-700',
   completed: 'bg-green-100 text-green-700',
   pending_final_verification: 'bg-yellow-100 text-yellow-700',
@@ -64,7 +64,7 @@ export default function AdminDashboard() {
   if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 size={32} className="animate-spin text-blue-600" />
+        <Loader2 size={32} className="animate-spin text-[#222222]" />
       </div>
     )
   }
@@ -86,8 +86,8 @@ export default function AdminDashboard() {
         {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {[
-            { label: 'Total Bookings', value: bookings.length, icon: ShoppingBag, color: 'text-blue-600' },
-            { label: 'Total Clients', value: clients.length, icon: Users, color: 'text-purple-600' },
+            { label: 'Total Bookings', value: bookings.length, icon: ShoppingBag, color: 'text-[#222222]' },
+            { label: 'Total Clients', value: clients.length, icon: Users, color: 'text-[#444444]' },
             { label: 'Advance Collected', value: `₹${totalRevenue.toLocaleString()}`, icon: IndianRupee, color: 'text-green-600' },
             { label: 'Pending Balance', value: `₹${pendingRevenue.toLocaleString()}`, icon: Clock, color: 'text-orange-600' },
           ].map(({ label, value, icon: Icon, color }) => (
@@ -106,7 +106,7 @@ export default function AdminDashboard() {
               key={t}
               onClick={() => setTab(t)}
               className={`px-5 py-2 rounded-xl font-semibold text-sm capitalize transition-colors ${
-                tab === t ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                tab === t ? 'bg-[#222222] text-white' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
               }`}
             >
               {t}
@@ -119,7 +119,7 @@ export default function AdminDashboard() {
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-5 border-b border-gray-100 flex items-center justify-between">
               <h2 className="font-bold text-gray-900 text-lg">All Bookings ({bookings.length})</h2>
-              <button onClick={fetchAll} className="text-sm text-blue-600 hover:underline">Refresh</button>
+              <button onClick={fetchAll} className="text-sm text-[#222222] hover:underline">Refresh</button>
             </div>
             {bookings.length === 0 ? (
               <div className="text-center py-16 text-gray-400">No bookings yet</div>
@@ -171,7 +171,7 @@ export default function AdminDashboard() {
                           {b.payment_screenshot_url ? (
                             <button
                               onClick={() => setLightboxUrl(b.payment_screenshot_url)}
-                              className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 font-medium"
+                              className="flex items-center gap-1 text-xs text-[#222222] hover:text-[#111111] font-medium"
                             >
                               <Image size={14} /> View
                             </button>
@@ -228,7 +228,7 @@ export default function AdminDashboard() {
                         <p className="text-sm text-gray-500 truncate">{c.email}</p>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="text-sm font-bold text-blue-600">{clientBookings.length} bookings</p>
+                        <p className="text-sm font-bold text-[#222222]">{clientBookings.length} bookings</p>
                         <p className="text-xs text-green-600 font-semibold">₹{spent.toLocaleString()} paid</p>
                       </div>
                     </div>
@@ -245,7 +245,7 @@ export default function AdminDashboard() {
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-5 border-b border-gray-100 flex items-center justify-between">
               <h2 className="font-bold text-gray-900 text-lg">All Feedback ({feedbacks.length})</h2>
-              <button onClick={fetchAll} className="text-sm text-blue-600 hover:underline">Refresh</button>
+              <button onClick={fetchAll} className="text-sm text-[#222222] hover:underline">Refresh</button>
             </div>
             {feedbacks.length === 0 ? (
               <div className="text-center py-16 text-gray-400">No feedback yet</div>
@@ -255,7 +255,7 @@ export default function AdminDashboard() {
                   <div key={f.id} className="p-4 hover:bg-gray-50 transition-colors">
                     <div className="flex items-center justify-between gap-3 mb-2">
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-xs shrink-0">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#222222] to-[#444444] flex items-center justify-center text-white font-bold text-xs shrink-0">
                           {f.name?.charAt(0)?.toUpperCase() || 'U'}
                         </div>
                         <div>

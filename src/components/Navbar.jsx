@@ -1,5 +1,5 @@
-﻿import { useState, useEffect } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { Menu, X, LogOut, LayoutDashboard } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 
@@ -16,7 +16,6 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const { user, signOut } = useAuthStore()
   const navigate = useNavigate()
-  const location = useLocation()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -30,23 +29,22 @@ export default function Navbar() {
   }
 
   return (
-    <nav
-      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+    <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
       style={{
-        background: scrolled ? 'rgba(10,15,46,0.97)' : 'rgba(10,15,46,0.85)',
+        background: scrolled ? 'rgba(34,34,34,0.98)' : 'rgba(34,34,34,0.92)',
         backdropFilter: 'blur(12px)',
-        borderBottom: scrolled ? '1px solid rgba(255,255,255,0.08)' : 'none',
-      }}
-    >
+        borderBottom: scrolled ? '1px solid rgba(255,255,255,0.1)' : 'none',
+        boxShadow: scrolled ? '0 4px 24px rgba(34,34,34,0.3)' : 'none',
+      }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <img src="/logo.png" alt="ASLEN TECH SOLUTIONS" className="h-9 w-9 rounded-full object-cover" />
-            <span className="text-white font-black text-base tracking-wide">ASLEN TECH</span>
+            <img src="/logo.png" alt="ASLEN" className="h-9 w-9 rounded-full object-cover" />
+            <span className="text-white font-black text-base tracking-wide" style={{ fontFamily: 'Poppins, sans-serif' }}>
+              ASLEN TECH
+            </span>
           </Link>
 
-          {/* Desktop links */}
           <div className="hidden md:flex items-center gap-6">
             {NAV_LINKS.map((l) => (
               <a key={l.label} href={l.href}
@@ -56,7 +54,6 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Desktop auth */}
           <div className="hidden md:flex items-center gap-3">
             {user ? (
               <>
@@ -71,43 +68,40 @@ export default function Navbar() {
               </>
             ) : (
               <Link to="/login"
-                className="btn-navy px-4 py-2 rounded-lg text-sm font-semibold">
+                className="bg-[#f59e0b] hover:bg-[#d97706] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors">
                 Sign In
               </Link>
             )}
           </div>
 
-          {/* Mobile toggle */}
           <button className="md:hidden text-white p-1" onClick={() => setOpen(!open)}>
             {open ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
       </div>
 
-      {/* Mobile menu */}
       {open && (
-        <div className="md:hidden px-4 pb-4 pt-2 space-y-2"
-          style={{ background: 'rgba(10,15,46,0.98)' }}>
+        <div className="md:hidden px-4 pb-4 pt-2 space-y-1" style={{ background: 'rgba(34,34,34,0.99)' }}>
           {NAV_LINKS.map((l) => (
             <a key={l.label} href={l.href} onClick={() => setOpen(false)}
-              className="block text-white/80 hover:text-white py-2 text-sm font-medium border-b border-white/10">
+              className="block text-white/80 hover:text-white py-2.5 text-sm font-medium border-b border-white/10">
               {l.label}
             </a>
           ))}
           {user ? (
             <>
               <button onClick={() => { navigate('/dashboard'); setOpen(false) }}
-                className="block w-full text-left text-white/80 hover:text-white py-2 text-sm font-medium">
+                className="block w-full text-left text-white/80 hover:text-white py-2.5 text-sm font-medium">
                 Dashboard
               </button>
               <button onClick={() => { handleSignOut(); setOpen(false) }}
-                className="block w-full text-left text-white/80 hover:text-white py-2 text-sm font-medium">
+                className="block w-full text-left text-white/80 hover:text-white py-2.5 text-sm font-medium">
                 Sign Out
               </button>
             </>
           ) : (
             <Link to="/login" onClick={() => setOpen(false)}
-              className="block btn-navy text-center px-4 py-2 rounded-lg text-sm font-semibold mt-2">
+              className="block bg-[#f59e0b] text-white text-center px-4 py-2.5 rounded-lg text-sm font-semibold mt-2">
               Sign In
             </Link>
           )}

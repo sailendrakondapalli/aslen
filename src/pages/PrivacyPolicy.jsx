@@ -19,7 +19,7 @@ export default function PrivacyPolicy() {
           </section>
           <section>
             <h2 className="text-lg font-bold text-gray-900 mb-2">Contact</h2>
-            <p>For any privacy-related queries, contact us at <a href="mailto:sailendrakondapalli@gmail.com" className="text-blue-600 hover:underline">sailendrakondapalli@gmail.com</a></p>
+            <p>For any privacy-related queries, contact us at <a href="mailto:sailendrakondapalli@gmail.com" className="text-[#222222] hover:underline">sailendrakondapalli@gmail.com</a></p>
           </section>
         </div>
       </div>

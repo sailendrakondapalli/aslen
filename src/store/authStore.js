@@ -19,8 +19,9 @@ const setCachedUser = (user) => {
 
 export const useAuthStore = create((set, get) => ({
   user: getCachedUser(),
-  loading: !getCachedUser(), // skip loading spinner if we have cached user
+  loading: !getCachedUser(),
 
+  // ── Google OAuth ──────────────────────────────────────────────────────────
   signInWithGoogle: async () => {
     if (!supabase) throw new Error('Supabase not configured')
     const { error } = await supabase.auth.signInWithOAuth({
@@ -33,12 +34,86 @@ export const useAuthStore = create((set, get) => ({
     if (error) throw error
   },
 
+  // ── Phone + Password signup ───────────────────────────────────────────────
+  signUpWithPhone: async (phone, password, name) => {
+    if (!supabase) throw new Error('Supabase not configured')
+    const formatted = phone.startsWith('+') ? phone : `+91${phone}`
+    const { data, error } = await supabase.auth.signUp({
+      phone: formatted,
+      password,
+      options: { data: { full_name: name } },
+    })
+    if (error) throw error
+    // Immediately save to users table after signup
+    if (data?.user) {
+      await supabase.from('users').upsert({
+        id: data.user.id,
+        phone: formatted,
+        name,
+        email: null,
+        profile_url: '',
+      }, { onConflict: 'id' })
+    }
+    return data
+  },
+
+  // ── Phone + Password login ────────────────────────────────────────────────
+  signInWithPhone: async (phone, password) => {
+    if (!supabase) throw new Error('Supabase not configured')
+    const formatted = phone.startsWith('+') ? phone : `+91${phone}`
+    const { data, error } = await supabase.auth.signInWithPassword({
+      phone: formatted,
+      password,
+    })
+    if (error) throw error
+    return data
+  },
+
+  // ── Send OTP for phone verification / login ───────────────────────────────
+  sendOTP: async (phone) => {
+    if (!supabase) throw new Error('Supabase not configured')
+    const formatted = phone.startsWith('+') ? phone : `+91${phone}`
+    const { error } = await supabase.auth.signInWithOtp({ phone: formatted })
+    if (error) throw error
+  },
+
+  // ── Verify OTP ────────────────────────────────────────────────────────────
+  verifyOTP: async (phone, token) => {
+    if (!supabase) throw new Error('Supabase not configured')
+    const formatted = phone.startsWith('+') ? phone : `+91${phone}`
+    const { data, error } = await supabase.auth.verifyOtp({
+      phone: formatted,
+      token,
+      type: 'sms',
+    })
+    if (error) throw error
+    // Return the user/session directly
+    return data
+  },
+
+  // ── Forgot password (sends OTP to reset) ─────────────────────────────────
+  sendForgotOTP: async (phone) => {
+    if (!supabase) throw new Error('Supabase not configured')
+    const formatted = phone.startsWith('+') ? phone : `+91${phone}`
+    const { error } = await supabase.auth.signInWithOtp({ phone: formatted })
+    if (error) throw error
+  },
+
+  // ── Reset password after OTP verified ────────────────────────────────────
+  resetPassword: async (newPassword) => {
+    if (!supabase) throw new Error('Supabase not configured')
+    const { error } = await supabase.auth.updateUser({ password: newPassword })
+    if (error) throw error
+  },
+
+  // ── Sign out ──────────────────────────────────────────────────────────────
   signOut: async () => {
     if (supabase) await supabase.auth.signOut()
     setCachedUser(null)
     set({ user: null, loading: false })
   },
 
+  // ── Initialize auth listener ──────────────────────────────────────────────
   initialize: (navigate) => {
     if (!supabase) {
       set({ loading: false })
@@ -51,20 +126,14 @@ export const useAuthStore = create((set, get) => ({
       set({ user, loading: false })
       if (user) syncUserToDb(user)
 
-      // On fresh OAuth login, redirect to dashboard
       if (event === 'SIGNED_IN' && navigate) {
         const isOAuthCallback = window.location.hash.includes('access_token') ||
           window.location.search.includes('code=')
-        if (isOAuthCallback) {
-          navigate('/dashboard', { replace: true })
-        }
+        if (isOAuthCallback) navigate('/dashboard', { replace: true })
       }
     })
-
-    // Also resolve session on load for non-OAuth page loads
     supabase.auth.getSession().then(({ data: { session } }) => {
       const user = session?.user ?? null
-      // Only update if different from cache to avoid flicker
       if (JSON.stringify(user) !== JSON.stringify(get().user)) {
         setCachedUser(user)
         set({ user, loading: false })
@@ -80,11 +149,14 @@ export const useAuthStore = create((set, get) => ({
 
 function syncUserToDb(user) {
   if (!supabase) return
-  const { id, email, user_metadata } = user
-  supabase.from('users').upsert({
+  const { id, email, phone, user_metadata } = user
+  const payload = {
     id,
-    email,
     name: user_metadata?.full_name || user_metadata?.name || '',
     profile_url: user_metadata?.avatar_url || '',
-  }, { onConflict: 'id' }).catch(() => {})
+  }
+  if (email) payload.email = email
+  if (phone) payload.phone = phone
+
+  supabase.from('users').upsert(payload, { onConflict: 'id' }).then(() => {})
 }
