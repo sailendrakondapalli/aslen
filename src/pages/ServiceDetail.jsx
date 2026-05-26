@@ -77,7 +77,7 @@ function PackageDetail({ service, pkg, onPaymentChoice, onBack }) {
   const [extraPages, setExtraPages] = useState(0)
   const isWebDev = service.id === 'web-development'
   const isCustom = pkg.price === 0
-  const extraCost = isWebDev ? extraPages * (pkg.name === 'Static Website' ? 500 : 1000) : 0
+  const extraCost = isWebDev ? extraPages * (pkg.name === 'Static Website' ? 1999 : 3999) : 0
   const total = pkg.price + extraCost
 
   return (
@@ -152,7 +152,7 @@ function PackageDetail({ service, pkg, onPaymentChoice, onBack }) {
                 className="w-10 h-10 rounded-xl border-2 border-gray-200 flex items-center justify-center text-xl font-bold hover:bg-gray-50 transition-colors">+</button>
               {extraPages > 0 && <span className="text-sm text-orange-600 font-semibold">+₹{extraCost.toLocaleString()}</span>}
             </div>
-            <p className="text-xs text-[#222222] mt-2">Static: ₹500/page · Dynamic: ₹1,000/page</p>
+            <p className="text-xs text-[#222222] mt-2">Static: ₹999/page · Dynamic: ₹1999/page</p>
           </div>
         )}
 

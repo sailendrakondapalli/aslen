@@ -31,8 +31,8 @@ export const services = [
     packages: [
       {
         name: 'Static Website',
-        price: 3999,
-        advance: 500,
+        price: 5999,
+        advance: 1999,
         bgImage: IMG.staticWeb,
         description: 'Perfect for businesses that need a clean, fast online presence — portfolio sites, landing pages, business brochures.',
         examples: [
@@ -44,8 +44,8 @@ export const services = [
       },
       {
         name: 'Dynamic Website',
-        price: 9999,
-        advance: 1000,
+        price: 21999,
+        advance: 3999,
         bgImage: IMG.dynamicWeb,
         description: 'Full-featured websites with real-time data, user logins, admin dashboards, and database integration. Ideal for e-commerce, booking platforms, and SaaS products.',
         examples: [
@@ -68,8 +68,8 @@ export const services = [
     packages: [
       {
         name: 'Full App',
-        price: 30000,
-        advance: 3000,
+        price: 45999,
+        advance: 9999,
         bgImage: IMG.mobileApp,
         description: 'End-to-end mobile app development with custom UI, backend API, push notifications, and 3 months of post-launch support.',
         examples: [
@@ -92,8 +92,8 @@ export const services = [
     packages: [
       {
         name: 'UI/UX Design',
-        price: 2999,
-        advance: 500,
+        price: 4999,
+        advance: 1499,
         bgImage: IMG.uiuxPkg,
         description: 'Full design package including user research, wireframes, mockups, interactive prototype, and Figma source files.',
         examples: [
@@ -116,8 +116,8 @@ export const services = [
     packages: [
       {
         name: 'Template Design',
-        price: 399,
-        advance: 11,
+        price: 699,
+        advance: 299,
         bgImage: IMG.templatePkg,
         description: 'Professional, print-ready templates in multiple formats — editable and branded to your business.',
         examples: [
@@ -140,8 +140,8 @@ export const services = [
     packages: [
       {
         name: 'Logo Design',
-        price: 599,
-        advance: 99,
+        price: 1299,
+        advance: 499,
         bgImage: IMG.logoPkg,
         description: '3 unique logo concepts with unlimited revisions, delivered in all formats (PNG, SVG, PDF) with brand guidelines.',
         examples: [
@@ -164,8 +164,8 @@ export const services = [
     packages: [
       {
         name: 'GMB Setup & Indexing',
-        price: 1799,
-        advance: 499,
+        price: 3999,
+        advance: 999,
         bgImage: IMG.gmbPkg,
         description: 'Complete Google Business Profile setup with verification, SEO optimization, photo uploads, and local search indexing.',
         examples: [
@@ -189,7 +189,7 @@ export const services = [
       {
         name: 'Business Card',
         price: 799,
-        advance: 99,
+        advance: 299,
         bgImage: IMG.bizCardPkg,
         description: 'Double-sided business card design with your branding, delivered as print-ready high-resolution files.',
         examples: [
