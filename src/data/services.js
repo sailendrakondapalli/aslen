@@ -228,4 +228,4 @@ export const services = [
 ]
 
 export const ADMIN_EMAILS = ['sailendrakondapalli@gmail.com', 'adduriaswani@gmail.com']
-export const WHATSAPP_NUMBER = '918143724405'
+export const WHATSAPP_NUMBER = '918019733766'

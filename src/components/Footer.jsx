@@ -40,7 +40,7 @@ export default function Footer() {
             <h3 className="text-white font-semibold mb-4">Contact Us</h3>
             <ul className="space-y-3 text-sm text-white/60">
               <li className="flex items-center gap-2"><Mail size={15} className="text-[#f59e0b] shrink-0" /><span>sailendrakondapalli@gmail.com</span></li>
-              <li className="flex items-center gap-2"><Phone size={15} className="text-[#f59e0b] shrink-0" /><span>+91 8143724405</span></li>
+              <li className="flex items-center gap-2"><Phone size={15} className="text-[#f59e0b] shrink-0" /><span>+91 8019733766</span></li>
               <li className="flex items-center gap-2"><MapPin size={15} className="text-[#f59e0b] shrink-0" /><span>India</span></li>
               <li className="flex items-center gap-2"><Globe size={15} className="text-[#f59e0b] shrink-0" /><span>www.aslen.in</span></li>
             </ul>
