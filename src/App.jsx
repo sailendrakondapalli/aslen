@@ -5,6 +5,7 @@ import { useAuthStore } from './store/authStore'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ProtectedRoute from './components/ProtectedRoute'
+import ChatBot from './components/ChatBot'
 import Home from './pages/Home'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
@@ -48,6 +49,7 @@ function AppInner() {
         <Route path="/Policy/RefundPolicy" element={<><RefundPolicy /><Footer /></>} />
         <Route path="/Policy/CancellationPolicy" element={<><CancellationPolicy /><Footer /></>} />
       </Routes>
+      <ChatBot />
     </>
   )
 }
