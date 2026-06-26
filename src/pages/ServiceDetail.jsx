@@ -12,54 +12,79 @@ const RZP_KEY = import.meta.env.VITE_RAZORPAY_KEY_ID
 function loadRazorpay() {
   return new Promise((resolve) => {
     if (window.Razorpay) { resolve(true); return }
-    const script = document.createElement('script')
-    script.src = 'https://checkout.razorpay.com/v1/checkout.js'
-    script.onload = () => resolve(true)
-    script.onerror = () => resolve(false)
-    document.body.appendChild(script)
+    const s = document.createElement('script')
+    s.src = 'https://checkout.razorpay.com/v1/checkout.js'
+    s.onload = () => resolve(true)
+    s.onerror = () => resolve(false)
+    document.body.appendChild(s)
   })
 }
 
-// ── Step 1: Package list ─────────────────────────────────────────────────────
+const cardStyle = { background: '#111928', borderColor: 'rgba(255,255,255,0.07)' }
+const cardHover = (e) => (e.currentTarget.style.borderColor = 'rgba(0,200,255,0.35)')
+const cardLeave = (e) => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)')
+
+// ── Step 1 ───────────────────────────────────────────────────────────────────
 function PackageList({ service, onSelect }) {
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12" style={{ fontFamily: 'Poppins, sans-serif' }}>
-      <p className="text-[#64748b] mb-2 text-base leading-relaxed">{service.description}</p>
-      <h2 className="text-2xl font-black text-[#1e293b] mt-6 mb-2">Choose a Package</h2>
-      <p className="text-[#94a3b8] text-sm mb-8">Select the package that fits your needs</p>
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <p className="text-base leading-relaxed mb-2" style={{ color: 'rgba(255,255,255,0.6)' }}>
+        {service.description}
+      </p>
+      <h2 className="text-2xl font-black text-white mt-6 mb-2">Choose a Package</h2>
+      <p className="text-sm mb-8" style={{ color: 'rgba(255,255,255,0.4)' }}>
+        Select the package that fits your needs
+      </p>
       <div className={`grid gap-6 ${service.packages.length === 1 ? 'grid-cols-1 max-w-md' : 'grid-cols-1 sm:grid-cols-2'}`}>
         {service.packages.map((pkg, i) => (
-          <button key={i} onClick={() => onSelect(pkg)}
-            className="text-left rounded-2xl border-2 border-[#e2e8f0] overflow-hidden hover:border-[#222222] hover:shadow-lg transition-all group">
-            {/* Package banner */}
-            <div className="relative h-36 overflow-hidden bg-[#222222]">
-              <img src={pkg.bgImage} alt="" className="absolute inset-0 w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-[#222222]/70" />
+          <button
+            key={i}
+            onClick={() => onSelect(pkg)}
+            className="text-left rounded-2xl overflow-hidden border transition-all group"
+            style={cardStyle}
+            onMouseEnter={cardHover}
+            onMouseLeave={cardLeave}
+          >
+            <div className="relative h-36 overflow-hidden" style={{ background: '#080E1C' }}>
+              <img src={pkg.bgImage} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40" />
+              <div className="absolute inset-0" style={{ background: 'rgba(8,14,28,0.6)' }} />
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
                 <h3 className="text-white font-black text-xl">{pkg.name}</h3>
-                {pkg.price > 0 && <p className="text-white/75 text-sm mt-1">from ₹{pkg.price.toLocaleString()}</p>}
+                {pkg.price > 0 && (
+                  <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.65)' }}>
+                    from ₹{pkg.price.toLocaleString()}
+                  </p>
+                )}
               </div>
-              <span className="absolute right-4 bottom-3 text-white/60 group-hover:text-[#f59e0b] text-2xl transition-colors">›</span>
+              <span
+                className="absolute right-4 bottom-3 text-2xl transition-colors group-hover:text-[#00C8FF]"
+                style={{ color: 'rgba(255,255,255,0.4)' }}
+              >›</span>
             </div>
-            <div className="bg-white p-5">
-              <p className="text-[#64748b] text-sm mb-3 leading-relaxed">{pkg.description}</p>
+            <div className="p-5">
+              <p className="text-sm mb-3 leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                {pkg.description}
+              </p>
               {pkg.price === 0 ? (
-                <span className="text-xl font-black text-[#1e293b]">Custom Pricing</span>
+                <span className="text-xl font-black text-white">Custom Pricing</span>
               ) : (
                 <div>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-black text-[#1e293b]">₹{pkg.price.toLocaleString()}</span>
-                    <span className="text-[#94a3b8] text-sm">total</span>
+                    <span className="text-2xl font-black text-white">₹{pkg.price.toLocaleString()}</span>
+                    <span className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>total</span>
                   </div>
-                  <div className="mt-1 inline-flex items-center gap-1 bg-[#fff7ed] text-[#d97706] text-sm font-semibold px-3 py-1 rounded-full">
+                  <div
+                    className="mt-2 inline-flex items-center gap-1 text-sm font-semibold px-3 py-1 rounded-full"
+                    style={{ background: 'rgba(0,200,255,0.1)', color: '#00C8FF', border: '1px solid rgba(0,200,255,0.2)' }}
+                  >
                     Advance: ₹{pkg.advance.toLocaleString()} (paid now)
                   </div>
                 </div>
               )}
               <ul className="mt-3 space-y-1.5">
                 {pkg.features.map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-[#64748b] text-sm">
-                    <CheckCircle size={13} className="text-[#222222] shrink-0" />
+                  <li key={f} className="flex items-center gap-2 text-sm" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                    <CheckCircle size={13} className="text-[#00C8FF] shrink-0" />
                     {f}
                   </li>
                 ))}
@@ -72,7 +97,7 @@ function PackageList({ service, onSelect }) {
   )
 }
 
-// ── Step 2: Package detail + payment type ────────────────────────────────────
+// ── Step 2 ───────────────────────────────────────────────────────────────────
 function PackageDetail({ service, pkg, onPaymentChoice, onBack }) {
   const [extraPages, setExtraPages] = useState(0)
   const isWebDev = service.id === 'web-development'
@@ -82,53 +107,62 @@ function PackageDetail({ service, pkg, onPaymentChoice, onBack }) {
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <button onClick={onBack} className="flex items-center gap-2 text-gray-500 hover:text-gray-800 mb-6 transition-colors">
+      <button
+        onClick={onBack}
+        className="flex items-center gap-2 mb-6 transition-colors hover:text-[#00C8FF]"
+        style={{ color: 'rgba(255,255,255,0.5)' }}
+      >
         <ArrowLeft size={18} /> Back to packages
       </button>
 
-      {/* Package detail banner */}
-      <div className="relative h-48 rounded-2xl overflow-hidden mb-6 bg-[#222222]">
-        <img src={pkg.bgImage} alt="" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-[#222222]/70" />
+      <div className="relative h-48 rounded-2xl overflow-hidden mb-6" style={{ background: '#080E1C' }}>
+        <img src={pkg.bgImage} alt="" className="absolute inset-0 w-full h-full object-cover opacity-40" />
+        <div className="absolute inset-0" style={{ background: 'rgba(8,14,28,0.6)' }} />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
           <h2 className="text-3xl font-black text-white">{pkg.name}</h2>
           {!isCustom && (
-            <p className="text-white/75 text-sm mt-1">
+            <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.65)' }}>
               ₹{total.toLocaleString()} total · ₹{pkg.advance.toLocaleString()} advance
             </p>
           )}
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-5">
-        <p className="text-gray-600 leading-relaxed mb-5">{pkg.description}</p>
+      <div className="rounded-2xl p-6 mb-5 border" style={{ background: '#111928', borderColor: 'rgba(0,200,255,0.15)' }}>
+        <p className="leading-relaxed mb-5" style={{ color: 'rgba(255,255,255,0.6)' }}>{pkg.description}</p>
 
-        <h3 className="font-bold text-gray-900 mb-3">What's included</h3>
+        <h3 className="font-bold text-white mb-3">What's included</h3>
         <ul className="space-y-2 mb-6">
           {pkg.features.map((f) => (
-            <li key={f} className="flex items-center gap-3 text-gray-700 text-sm">
-              <CheckCircle size={15} className="text-green-500 shrink-0" />
+            <li key={f} className="flex items-center gap-3 text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>
+              <CheckCircle size={15} className="text-[#00C8FF] shrink-0" />
               {f}
             </li>
           ))}
         </ul>
 
-        {/* Real-world examples */}
         {pkg.examples && pkg.examples.length > 0 && (
           <>
-            <h3 className="font-bold text-gray-900 mb-3">Real-world examples</h3>
+            <h3 className="font-bold text-white mb-3">Real-world examples</h3>
             <div className="space-y-2 mb-6">
               {pkg.examples.map((ex, i) => (
-                <div key={i} className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
-                  <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${service.color} flex items-center justify-center shrink-0 text-white text-xs font-black`}>
+                <div
+                  key={i}
+                  className="flex items-start gap-3 p-3 rounded-xl"
+                  style={{ background: 'rgba(0,200,255,0.05)', border: '1px solid rgba(0,200,255,0.1)' }}
+                >
+                  <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-xs font-black"
+                    style={{ background: 'linear-gradient(135deg,#00C8FF,#0062FF)', color: '#080E1C' }}
+                  >
                     {i + 1}
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900 text-sm">{ex.label}</p>
-                    <p className="text-gray-500 text-xs mt-0.5">{ex.desc}</p>
+                    <p className="font-semibold text-white text-sm">{ex.label}</p>
+                    <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.45)' }}>{ex.desc}</p>
                     {ex.url && ex.url !== '#' && (
                       <a href={ex.url} target="_blank" rel="noopener noreferrer"
-                        className="text-[#222222] text-xs hover:underline mt-0.5 inline-block">
+                        className="text-[#00C8FF] text-xs hover:underline mt-0.5 inline-block">
                         View live →
                       </a>
                     )}
@@ -141,44 +175,71 @@ function PackageDetail({ service, pkg, onPaymentChoice, onBack }) {
 
         {isWebDev && (
           <div className="mb-6">
-            <label className="block text-sm font-semibold text-gray-700 mb-3">
+            <label className="block text-sm font-semibold text-white mb-3">
               Extra Pages (beyond 5 included)
             </label>
             <div className="flex items-center gap-4">
-              <button onClick={() => setExtraPages(Math.max(0, extraPages - 1))}
-                className="w-10 h-10 rounded-xl border-2 border-gray-200 flex items-center justify-center text-xl font-bold hover:bg-gray-50 transition-colors">−</button>
-              <span className="text-xl font-black w-8 text-center">{extraPages}</span>
-              <button onClick={() => setExtraPages(extraPages + 1)}
-                className="w-10 h-10 rounded-xl border-2 border-gray-200 flex items-center justify-center text-xl font-bold hover:bg-gray-50 transition-colors">+</button>
-              {extraPages > 0 && <span className="text-sm text-orange-600 font-semibold">+₹{extraCost.toLocaleString()}</span>}
+              <button
+                onClick={() => setExtraPages(Math.max(0, extraPages - 1))}
+                className="w-10 h-10 rounded-xl flex items-center justify-center text-xl font-bold text-white transition-all"
+                style={{ border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.05)' }}
+                onMouseEnter={e => (e.currentTarget.style.borderColor = '#00C8FF')}
+                onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)')}
+              >−</button>
+              <span className="text-xl font-black w-8 text-center text-white">{extraPages}</span>
+              <button
+                onClick={() => setExtraPages(extraPages + 1)}
+                className="w-10 h-10 rounded-xl flex items-center justify-center text-xl font-bold text-white transition-all"
+                style={{ border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.05)' }}
+                onMouseEnter={e => (e.currentTarget.style.borderColor = '#00C8FF')}
+                onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)')}
+              >+</button>
+              {extraPages > 0 && (
+                <span className="text-sm font-semibold text-[#00C8FF]">+₹{extraCost.toLocaleString()}</span>
+              )}
             </div>
-            <p className="text-xs text-[#222222] mt-2">Static: ₹999/page · Dynamic: ₹1999/page</p>
+            <p className="text-xs mt-2" style={{ color: 'rgba(0,200,255,0.7)' }}>
+              Static: ₹999/page · Dynamic: ₹1999/page
+            </p>
           </div>
         )}
 
         {isCustom ? (
           <button
             onClick={() => onPaymentChoice('whatsapp', extraPages, total)}
-            className="w-full bg-green-500 hover:bg-green-600 text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-colors"
+            className="w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-colors text-white"
+            style={{ background: '#22c55e' }}
+            onMouseEnter={e => (e.currentTarget.style.background = '#16a34a')}
+            onMouseLeave={e => (e.currentTarget.style.background = '#22c55e')}
           >
             <MessageCircle size={20} /> Send Enquiry via WhatsApp
           </button>
         ) : (
           <div className="space-y-3">
-            <p className="text-sm font-semibold text-gray-700 mb-2">How would you like to pay?</p>
-            <button onClick={() => onPaymentChoice('advance', extraPages, total)}
-              className="w-full p-5 rounded-xl border-2 border-[#e2e8f0] hover:border-[#f59e0b] hover:bg-[#fffbeb] transition-all text-left">
-              <p className="font-bold text-[#1e293b] text-lg">Pay Advance Only</p>
-              <p className="text-[#d97706] font-semibold mt-1">
+            <p className="text-sm font-semibold text-white mb-2">How would you like to pay?</p>
+            <button
+              onClick={() => onPaymentChoice('advance', extraPages, total)}
+              className="w-full p-5 rounded-xl text-left transition-all"
+              style={{ border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,200,255,0.03)' }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(0,200,255,0.4)'; e.currentTarget.style.background = 'rgba(0,200,255,0.07)' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.background = 'rgba(0,200,255,0.03)' }}
+            >
+              <p className="font-bold text-white text-lg">Pay Advance Only</p>
+              <p className="font-semibold mt-1 text-[#00C8FF]">
                 ₹{pkg.advance.toLocaleString()} now · ₹{(total - pkg.advance).toLocaleString()} after delivery
               </p>
-              <p className="text-[#94a3b8] text-sm mt-1">Start your project with a small advance</p>
+              <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>Start your project with a small advance</p>
             </button>
-            <button onClick={() => onPaymentChoice('full', extraPages, total)}
-              className="w-full p-5 rounded-xl border-2 border-[#e2e8f0] hover:border-[#222222] hover:bg-[#f5f5f5] transition-all text-left">
-              <p className="font-bold text-[#1e293b] text-lg">Pay Full Amount</p>
-              <p className="text-[#222222] font-semibold mt-1">₹{total.toLocaleString()} — pay everything now</p>
-              <p className="text-[#94a3b8] text-sm mt-1">Complete payment upfront</p>
+            <button
+              onClick={() => onPaymentChoice('full', extraPages, total)}
+              className="w-full p-5 rounded-xl text-left transition-all"
+              style={{ border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.03)' }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(0,200,255,0.4)'; e.currentTarget.style.background = 'rgba(255,255,255,0.06)' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.background = 'rgba(255,255,255,0.03)' }}
+            >
+              <p className="font-bold text-white text-lg">Pay Full Amount</p>
+              <p className="font-semibold mt-1 text-[#00C8FF]">₹{total.toLocaleString()} — pay everything now</p>
+              <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>Complete payment upfront</p>
             </button>
           </div>
         )}
@@ -187,7 +248,7 @@ function PackageDetail({ service, pkg, onPaymentChoice, onBack }) {
   )
 }
 
-// ── Step 3: Description + payment methods ────────────────────────────────────
+// ── Step 3 ───────────────────────────────────────────────────────────────────
 function PaymentStep({ service, pkg, paymentType, extraPages, totalPrice, onBack }) {
   const { user } = useAuthStore()
   const navigate = useNavigate()
@@ -230,22 +291,15 @@ function PaymentStep({ service, pkg, paymentType, extraPages, totalPrice, onBack
       name: user.user_metadata?.full_name || user.user_metadata?.name || '',
       profile_url: user.user_metadata?.avatar_url || '',
     }, { onConflict: 'id' })
-
     const { data, error } = await supabase.from('bookings').insert({
-      user_id: user.id,
-      user_email: user.email,
-      service_id: service.id,
-      service_title: service.title,
-      package_name: pkg.name,
-      payment_method: method,
-      razorpay_payment_id: paymentId,
-      advance_paid: amountToPay,
+      user_id: user.id, user_email: user.email,
+      service_id: service.id, service_title: service.title,
+      package_name: pkg.name, payment_method: method,
+      razorpay_payment_id: paymentId, advance_paid: amountToPay,
       total_amount: totalPrice,
       extra_pages: service.id === 'web-development' ? extraPages : 0,
-      description,
-      status: 'confirmed',
+      description, status: 'confirmed',
     }).select().single()
-
     if (error) throw error
     return data
   }
@@ -255,20 +309,12 @@ function PaymentStep({ service, pkg, paymentType, extraPages, totalPrice, onBack
     setLoading(true)
     const loaded = await loadRazorpay()
     if (!loaded) { toast.error('Payment gateway failed to load'); setLoading(false); return }
-
     const options = {
-      key: RZP_KEY,
-      amount: amountToPay * 100,
-      currency: 'INR',
-      name: 'ASLEN TECH SOLUTIONS',
-      description: `${service.title} - ${pkg.name}`,
+      key: RZP_KEY, amount: amountToPay * 100, currency: 'INR',
+      name: 'ASLEN TECH SOLUTIONS', description: `${service.title} - ${pkg.name}`,
       image: '/favicon.svg',
-      prefill: {
-        name: user.user_metadata?.full_name || '',
-        email: user.email,
-        contact: '',
-      },
-      theme: { color: '#2563eb' },
+      prefill: { name: user.user_metadata?.full_name || '', email: user.email, contact: '' },
+      theme: { color: '#00C8FF' },
       handler: async (response) => {
         try {
           const booking = await saveBooking(response.razorpay_payment_id, method || 'razorpay')
@@ -282,84 +328,109 @@ function PaymentStep({ service, pkg, paymentType, extraPages, totalPrice, onBack
       },
       modal: { ondismiss: () => setLoading(false) },
     }
-
     const rzp = new window.Razorpay(options)
     rzp.on('payment.failed', (r) => { toast.error(`Payment failed: ${r.error.description}`); setLoading(false) })
     rzp.open()
     setLoading(false)
   }
 
+  const payMethods = [
+    { id: 'upi',        label: 'UPI',                 sub: 'GPay, PhonePe, Paytm, BHIM',   emoji: '📱' },
+    { id: 'card',       label: 'Debit / Credit Card', sub: 'Visa, Mastercard, RuPay',       emoji: '💳' },
+    { id: 'netbanking', label: 'Net Banking',          sub: 'SBI, HDFC, ICICI & 50+ banks', emoji: '🏦' },
+    { id: 'wallet',     label: 'Wallets',              sub: 'Paytm, Mobikwik & more',        emoji: '👛' },
+    { id: 'emi',        label: 'EMI',                  sub: 'No-cost EMI on select cards',   emoji: '📅' },
+  ]
+
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <button onClick={onBack} className="flex items-center gap-2 text-gray-500 hover:text-gray-800 mb-8 transition-colors">
+      <button
+        onClick={onBack}
+        className="flex items-center gap-2 mb-8 transition-colors hover:text-[#00C8FF]"
+        style={{ color: 'rgba(255,255,255,0.5)' }}
+      >
         <ArrowLeft size={18} /> Back
       </button>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 space-y-6">
+      <div className="rounded-2xl p-8 space-y-6 border" style={{ background: '#111928', borderColor: 'rgba(0,200,255,0.15)' }}>
         {!isCustom && (
-          <div className="bg-[#f5f5f5] rounded-xl p-5 text-center">
-            <p className="text-sm text-[#64748b]">{paymentType === 'full' ? 'Full payment' : 'Advance payment'}</p>
-            <p className="text-4xl font-black text-[#222222] mt-1">₹{amountToPay.toLocaleString()}</p>
+          <div className="rounded-xl p-5 text-center" style={{ background: 'rgba(0,200,255,0.06)', border: '1px solid rgba(0,200,255,0.15)' }}>
+            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+              {paymentType === 'full' ? 'Full payment' : 'Advance payment'}
+            </p>
+            <p className="text-4xl font-black text-[#00C8FF] mt-1">₹{amountToPay.toLocaleString()}</p>
             {paymentType === 'advance' && (
-              <p className="text-sm text-[#94a3b8] mt-1">Remaining ₹{(totalPrice - pkg.advance).toLocaleString()} after delivery</p>
+              <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                Remaining ₹{(totalPrice - pkg.advance).toLocaleString()} after delivery
+              </p>
             )}
           </div>
         )}
 
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-sm font-semibold text-white mb-2">
             {isCustom ? 'Describe your requirement' : 'Project requirements (optional)'}
           </label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={4}
-            placeholder={isCustom
-              ? 'Tell us what you need and we will reach out via WhatsApp...'
-              : 'Describe what you need, any specific requirements...'}
-            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#222222] resize-none"
+            placeholder={isCustom ? 'Tell us what you need...' : 'Describe your requirements...'}
+            className="w-full rounded-xl px-4 py-3 text-sm text-white resize-none"
+            style={{ background: '#080E1C', border: '1px solid rgba(255,255,255,0.1)' }}
           />
         </div>
 
         {isCustom ? (
-          <button onClick={sendWhatsAppEnquiry}
-            className="w-full bg-green-500 hover:bg-green-600 text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-colors">
+          <button
+            onClick={sendWhatsAppEnquiry}
+            className="w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-colors text-white"
+            style={{ background: '#22c55e' }}
+            onMouseEnter={e => (e.currentTarget.style.background = '#16a34a')}
+            onMouseLeave={e => (e.currentTarget.style.background = '#22c55e')}
+          >
             <MessageCircle size={20} /> Send via WhatsApp
           </button>
         ) : (
           <>
             <div>
-              <p className="text-sm font-semibold text-gray-700 mb-3">Choose payment method</p>
+              <p className="text-sm font-semibold text-white mb-3">Choose payment method</p>
               <div className="space-y-2">
-                {[
-                  { id: 'upi',        label: 'UPI',                sub: 'GPay, PhonePe, Paytm, BHIM',   emoji: '📱' },
-                  { id: 'card',       label: 'Debit / Credit Card', sub: 'Visa, Mastercard, RuPay',      emoji: '💳' },
-                  { id: 'netbanking', label: 'Net Banking',         sub: 'SBI, HDFC, ICICI & 50+ banks', emoji: '🏦' },
-                  { id: 'wallet',     label: 'Wallets',             sub: 'Paytm, Mobikwik & more',       emoji: '👛' },
-                  { id: 'emi',        label: 'EMI',                 sub: 'No-cost EMI on select cards',  emoji: '📅' },
-                ].map(({ id, label, sub, emoji }) => (
-                  <button key={id} onClick={() => handleRazorpay(id)} disabled={loading}
-                    className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-[#e2e8f0] hover:border-[#222222] hover:bg-[#f5f5f5] transition-all text-left disabled:opacity-60">
+                {payMethods.map(({ id, label, sub, emoji }) => (
+                  <button
+                    key={id}
+                    onClick={() => handleRazorpay(id)}
+                    disabled={loading}
+                    className="w-full flex items-center gap-4 p-4 rounded-xl text-left disabled:opacity-60 transition-all"
+                    style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)' }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(0,200,255,0.35)'; e.currentTarget.style.background = 'rgba(0,200,255,0.05)' }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.background = 'rgba(255,255,255,0.03)' }}
+                  >
                     <span className="text-2xl w-10 text-center">{emoji}</span>
                     <div className="flex-1">
-                      <p className="font-semibold text-sm text-[#1e293b]">{label}</p>
-                      <p className="text-xs text-[#94a3b8] mt-0.5">{sub}</p>
+                      <p className="font-semibold text-sm text-white">{label}</p>
+                      <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.4)' }}>{sub}</p>
                     </div>
-                    <span className="text-[#94a3b8] text-xl">›</span>
+                    <span className="text-xl" style={{ color: 'rgba(255,255,255,0.3)' }}>›</span>
                   </button>
                 ))}
               </div>
             </div>
 
-            <button onClick={() => handleRazorpay()} disabled={loading}
-              className="w-full bg-[#222222] hover:bg-[#111111] text-white py-4 rounded-xl font-bold text-lg transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
-              {loading ? <Loader2 size={18} className="animate-spin" /> : null}
+            <button
+              onClick={() => handleRazorpay()}
+              disabled={loading}
+              className="btn-primary w-full py-4 rounded-xl font-bold text-lg disabled:opacity-60 flex items-center justify-center gap-2"
+            >
+              {loading && <Loader2 size={18} className="animate-spin" />}
               {loading ? 'Loading...' : 'Open All Payment Options'}
             </button>
 
-            <div className="flex items-center gap-2 bg-[#f5f5f5] rounded-xl p-3">
-              <CheckCircle size={14} className="text-[#222222] shrink-0" />
-              <p className="text-xs text-[#222222]">100% secure · SSL encrypted · Powered by Razorpay</p>
+            <div className="flex items-center gap-2 rounded-xl p-3" style={{ background: 'rgba(0,200,255,0.05)', border: '1px solid rgba(0,200,255,0.12)' }}>
+              <CheckCircle size={14} className="text-[#00C8FF] shrink-0" />
+              <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                100% secure · SSL encrypted · Powered by Razorpay
+              </p>
             </div>
           </>
         )}
@@ -372,7 +443,7 @@ function PaymentStep({ service, pkg, paymentType, extraPages, totalPrice, onBack
 export default function ServiceDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const [step, setStep] = useState('packages') // packages | detail | payment
+  const [step, setStep] = useState('packages')
   const [selectedPkg, setSelectedPkg] = useState(null)
   const [paymentType, setPaymentType] = useState(null)
   const [extraPages, setExtraPages] = useState(0)
@@ -382,62 +453,69 @@ export default function ServiceDetail() {
 
   if (!service) {
     return (
-      <div className="min-h-screen flex items-center justify-center pt-16">
+      <div className="min-h-screen flex items-center justify-center pt-16" style={{ background: '#080E1C' }}>
         <div className="text-center">
-          <p className="text-gray-500 text-lg">Service not found.</p>
-          <button onClick={() => navigate('/')} className="mt-4 text-[#222222] underline">Go Home</button>
+          <p className="text-lg" style={{ color: 'rgba(255,255,255,0.5)' }}>Service not found.</p>
+          <button onClick={() => navigate('/')} className="mt-4 text-[#00C8FF] underline">Go Home</button>
         </div>
       </div>
     )
   }
 
   const Icon = Icons[service.icon] || Icons.Star
-
-  const handleSelectPackage = (pkg) => {
-    setSelectedPkg(pkg)
-    setStep('detail')
-  }
-
+  const handleSelectPackage = (pkg) => { setSelectedPkg(pkg); setStep('detail') }
   const handlePaymentChoice = (type, extra, total) => {
-    setPaymentType(type)
-    setExtraPages(extra)
-    setTotalPrice(total)
-    setStep('payment')
+    setPaymentType(type); setExtraPages(extra); setTotalPrice(total); setStep('payment')
   }
-
   const stepTitles = { packages: 'Choose a Package', detail: selectedPkg?.name, payment: 'Complete Payment' }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-16">
-      {/* Hero */}
-      <div className="relative py-14 overflow-hidden bg-[#222222]">
-        <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-white/5 -translate-y-1/2 translate-x-1/3 pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full bg-white/5 translate-y-1/2 -translate-x-1/4 pointer-events-none" />
+    <div className="min-h-screen pt-16" style={{ background: '#080E1C', fontFamily: 'Space Grotesk, sans-serif' }}>
+
+      <div className="relative py-14 overflow-hidden" style={{ background: '#0C1325' }}>
+        <div
+          className="absolute top-0 right-0 w-96 h-96 rounded-full pointer-events-none"
+          style={{ background: 'radial-gradient(circle,rgba(0,200,255,0.15) 0%,transparent 70%)', transform: 'translate(30%,-30%)' }}
+        />
+        <div
+          className="absolute bottom-0 left-0 w-64 h-64 rounded-full pointer-events-none"
+          style={{ background: 'radial-gradient(circle,rgba(0,98,255,0.12) 0%,transparent 70%)', transform: 'translate(-20%,30%)' }}
+        />
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <button
             onClick={() => step === 'packages' ? navigate(-1) : setStep(step === 'payment' ? 'detail' : 'packages')}
-            className="flex items-center gap-2 text-white/80 hover:text-white mb-6 transition-colors"
+            className="flex items-center gap-2 mb-6 transition-colors hover:text-[#00C8FF]"
+            style={{ color: 'rgba(255,255,255,0.6)' }}
           >
             <ArrowLeft size={18} /> Back
           </button>
           <div className="flex items-center gap-4 mb-3">
-            <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center">
-              <Icon size={28} className="text-white" />
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center"
+              style={{ background: 'rgba(0,200,255,0.1)', border: '1px solid rgba(0,200,255,0.25)' }}
+            >
+              <Icon size={28} className="text-[#00C8FF]" />
             </div>
             <div>
               <h1 className="text-3xl font-black text-white">{service.title}</h1>
-          <p className="text-white/70 text-sm mt-0.5">{stepTitles[step]}</p>
+              <p className="text-sm mt-0.5" style={{ color: 'rgba(255,255,255,0.5)' }}>{stepTitles[step]}</p>
             </div>
           </div>
-          <p className="text-white/75 text-base max-w-2xl">{service.shortDesc}</p>
-
-          {/* Step indicator */}
+          <p className="text-base max-w-2xl" style={{ color: 'rgba(255,255,255,0.6)' }}>{service.shortDesc}</p>
           <div className="flex items-center gap-2 mt-6">
             {['packages', 'detail', 'payment'].map((s, i) => (
-              <div key={s} className={`h-1.5 rounded-full transition-all ${
-                step === s ? 'w-8 bg-white' :
-                ['packages','detail','payment'].indexOf(step) > i ? 'w-5 bg-white/60' : 'w-5 bg-white/25'
-              }`} />
+              <div
+                key={s}
+                className="h-1.5 rounded-full transition-all"
+                style={{
+                  width: step === s ? '32px' : '20px',
+                  background: step === s
+                    ? '#00C8FF'
+                    : ['packages','detail','payment'].indexOf(step) > i
+                      ? 'rgba(0,200,255,0.5)'
+                      : 'rgba(255,255,255,0.2)',
+                }}
+              />
             ))}
           </div>
         </div>

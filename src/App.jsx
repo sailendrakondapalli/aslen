@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { useAuthStore } from './store/authStore'
@@ -6,6 +6,7 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ProtectedRoute from './components/ProtectedRoute'
 import ChatBot from './components/ChatBot'
+import SplashScreen from './components/SplashScreen'
 import Home from './pages/Home'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
@@ -55,9 +56,14 @@ function AppInner() {
 }
 
 export default function App() {
+  const [splash, setSplash] = useState(true)
+
   return (
-    <BrowserRouter>
-      <AppInner />
-    </BrowserRouter>
+    <>
+      {splash && <SplashScreen onDone={() => setSplash(false)} />}
+      <BrowserRouter>
+        <AppInner />
+      </BrowserRouter>
+    </>
   )
 }

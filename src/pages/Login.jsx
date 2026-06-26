@@ -94,14 +94,15 @@ export default function Login() {
     finally { setBusy(false) }
   }
 
-  const inp = "w-full border border-[#e2e8f0] rounded-xl px-4 py-3 text-sm text-[#1e293b] placeholder-[#94a3b8]"
+  const inp = "w-full rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 outline-none transition-all"
+  const inpStyle = { background: '#080E1C', border: '1px solid rgba(255,255,255,0.1)' }
   const otpInp = `${inp} text-center text-2xl tracking-widest font-bold`
-  const btn = "w-full bg-[#222222] hover:bg-[#111111] text-white py-3 rounded-xl font-semibold transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+  const btn = "w-full btn-primary py-3 rounded-xl font-semibold disabled:opacity-60 flex items-center justify-center gap-2"
 
   const OTPResend = () => (
     <div className="text-center">
       <button type="button" onClick={handleResendOTP} disabled={countdown > 0 || busy}
-        className="text-sm font-medium text-[#222222] hover:underline disabled:text-[#94a3b8]">
+        className="text-sm font-medium text-[#00C8FF] hover:underline disabled:opacity-40">
         {countdown > 0 ? `Resend OTP in ${countdown}s` : 'Resend OTP'}
       </button>
     </div>
@@ -116,69 +117,72 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#222222] px-4 py-10" style={{ fontFamily: 'Poppins, sans-serif' }}>
-      {/* Decorative circles */}
-      <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-white/5 -translate-y-1/3 translate-x-1/3 pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full bg-white/5 translate-y-1/3 -translate-x-1/4 pointer-events-none" />
+    <div className="min-h-screen flex items-center justify-center px-4 py-10 relative" style={{ background: '#080E1C', fontFamily: 'Space Grotesk, sans-serif' }}>
+      {/* Orbs */}
+      <div className="absolute top-0 right-0 w-96 h-96 rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(0,200,255,0.15) 0%, transparent 70%)', transform: 'translate(30%, -30%)' }} />
+      <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(0,98,255,0.12) 0%, transparent 70%)', transform: 'translate(-20%, 30%)' }} />
 
-      <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md relative z-10">
+      <div className="rounded-3xl p-8 w-full max-w-md relative z-10 border" style={{ background: '#111928', borderColor: 'rgba(0,200,255,0.15)' }}>
         {/* Header */}
         <div className="text-center mb-7">
-          <div className="w-14 h-14 rounded-2xl bg-[#222222] flex items-center justify-center mx-auto mb-3">
-            <img src="/logo.png" alt="A" className="w-10 h-10 rounded-xl object-cover" onError={e => { e.target.style.display='none'; e.target.nextSibling.style.display='block' }} />
-            <span className="text-white font-black text-xl hidden">A</span>
-          </div>
-          <h1 className="text-2xl font-black text-[#1e293b]">{titles[mode]}</h1>
-          <p className="text-[#64748b] text-sm mt-1">{subtitles[mode]}</p>
+          <img src="/newlogo.png" alt="ASLEN" className="h-14 w-auto object-contain mx-auto mb-3" />
+          <h1 className="text-2xl font-black text-white">{titles[mode]}</h1>
+          <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>{subtitles[mode]}</p>
         </div>
 
         {/* LOGIN */}
         {mode === 'login' && (
           <form onSubmit={handleLoginSendOTP} className="space-y-4">
             <div className="relative">
-              <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94a3b8]" />
-              <span className="absolute left-9 top-1/2 -translate-y-1/2 text-sm text-[#64748b] font-medium">+91</span>
+              <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(255,255,255,0.4)' }} />
+              <span className="absolute left-9 top-1/2 -translate-y-1/2 text-sm font-medium" style={{ color: 'rgba(255,255,255,0.5)' }}>+91</span>
               <input type="tel" placeholder="Mobile Number" value={phone}
                 onChange={e => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                className={`${inp} pl-16`} required />
+                className={`${inp} pl-16`} style={inpStyle} required />
             </div>
             <button type="submit" disabled={busy} className={btn}>
               {busy && <Loader2 size={16} className="animate-spin" />}
               {busy ? 'Sending OTP...' : 'Send OTP'}
             </button>
             <div className="flex items-center gap-3">
-              <div className="flex-1 h-px bg-[#e2e8f0]" />
-              <span className="text-xs text-[#94a3b8]">or</span>
-              <div className="flex-1 h-px bg-[#e2e8f0]" />
+              <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.1)' }} />
+              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>or</span>
+              <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.1)' }} />
             </div>
             <button type="button" onClick={handleGoogle} disabled={busy}
-              className="w-full flex items-center justify-center gap-3 border-2 border-[#e2e8f0] rounded-xl py-3 font-semibold text-[#1e293b] hover:bg-[#f5f5f5] transition-colors disabled:opacity-60">
+              className="w-full flex items-center justify-center gap-3 rounded-xl py-3 font-semibold text-white transition-all disabled:opacity-60"
+              style={{ border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.04)' }}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.04)'}>
               <GoogleIcon /> Continue with Google
             </button>
-            <p className="text-center text-sm text-[#64748b]">
+            <p className="text-center text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
               Don't have an account?{' '}
               <button type="button" onClick={() => { setMode('register'); setOtp('') }}
-                className="text-[#222222] font-semibold hover:underline">Register</button>
+                className="text-[#00C8FF] font-semibold hover:underline">Register</button>
             </p>
           </form>
         )}
 
-        {/* LOGIN OTP */}
         {mode === 'login-otp' && (
           <form onSubmit={handleLoginVerifyOTP} className="space-y-4">
-            <div className="bg-[#f5f5f5] rounded-xl p-3 text-sm text-[#222222] text-center font-medium">
+            <div className="rounded-xl p-3 text-sm text-center font-medium"
+              style={{ background: 'rgba(0,200,255,0.08)', color: '#00C8FF', border: '1px solid rgba(0,200,255,0.2)' }}>
               OTP sent to <strong>+91{phone}</strong>
             </div>
             <input type="text" placeholder="• • • • • •" value={otp} maxLength={6}
               onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              className={otpInp} required />
+              className={otpInp} style={inpStyle} required />
             <button type="submit" disabled={busy} className={btn}>
               {busy && <Loader2 size={16} className="animate-spin" />}
               {busy ? 'Verifying...' : 'Verify & Sign In'}
             </button>
             <OTPResend />
             <button type="button" onClick={() => { setMode('login'); setOtp('') }}
-              className="flex items-center gap-1 text-sm text-[#64748b] hover:text-[#1e293b] mx-auto">
+              className="flex items-center gap-1 text-sm mx-auto transition-colors hover:text-[#00C8FF]"
+              style={{ color: 'rgba(255,255,255,0.5)' }}>
               <ArrowLeft size={14} /> Back
             </button>
           </form>
@@ -188,35 +192,38 @@ export default function Login() {
         {mode === 'register' && (
           <form onSubmit={handleRegisterSendOTP} className="space-y-4">
             <div className="relative">
-              <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94a3b8]" />
+              <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(255,255,255,0.4)' }} />
               <input type="text" placeholder="Full Name" value={name}
                 onChange={e => setName(e.target.value)}
-                className={`${inp} pl-10`} required />
+                className={`${inp} pl-10`} style={inpStyle} required />
             </div>
             <div className="relative">
-              <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94a3b8]" />
-              <span className="absolute left-9 top-1/2 -translate-y-1/2 text-sm text-[#64748b] font-medium">+91</span>
+              <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(255,255,255,0.4)' }} />
+              <span className="absolute left-9 top-1/2 -translate-y-1/2 text-sm font-medium" style={{ color: 'rgba(255,255,255,0.5)' }}>+91</span>
               <input type="tel" placeholder="Mobile Number" value={phone}
                 onChange={e => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                className={`${inp} pl-16`} required />
+                className={`${inp} pl-16`} style={inpStyle} required />
             </div>
             <button type="submit" disabled={busy} className={btn}>
               {busy && <Loader2 size={16} className="animate-spin" />}
               {busy ? 'Sending OTP...' : 'Send OTP'}
             </button>
             <div className="flex items-center gap-3">
-              <div className="flex-1 h-px bg-[#e2e8f0]" />
-              <span className="text-xs text-[#94a3b8]">or</span>
-              <div className="flex-1 h-px bg-[#e2e8f0]" />
+              <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.1)' }} />
+              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>or</span>
+              <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.1)' }} />
             </div>
             <button type="button" onClick={handleGoogle} disabled={busy}
-              className="w-full flex items-center justify-center gap-3 border-2 border-[#e2e8f0] rounded-xl py-3 font-semibold text-[#1e293b] hover:bg-[#f5f5f5] transition-colors disabled:opacity-60">
+              className="w-full flex items-center justify-center gap-3 rounded-xl py-3 font-semibold text-white transition-all disabled:opacity-60"
+              style={{ border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.04)' }}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.04)'}>
               <GoogleIcon /> Continue with Google
             </button>
-            <p className="text-center text-sm text-[#64748b]">
+            <p className="text-center text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
               Already have an account?{' '}
               <button type="button" onClick={() => { setMode('login'); setOtp('') }}
-                className="text-[#222222] font-semibold hover:underline">Sign In</button>
+                className="text-[#00C8FF] font-semibold hover:underline">Sign In</button>
             </p>
           </form>
         )}
@@ -224,30 +231,32 @@ export default function Login() {
         {/* REGISTER OTP */}
         {mode === 'register-otp' && (
           <form onSubmit={handleRegisterVerifyOTP} className="space-y-4">
-            <div className="bg-[#f5f5f5] rounded-xl p-3 text-sm text-[#222222] text-center font-medium">
+            <div className="rounded-xl p-3 text-sm text-center font-medium"
+              style={{ background: 'rgba(0,200,255,0.08)', color: '#00C8FF', border: '1px solid rgba(0,200,255,0.2)' }}>
               OTP sent to <strong>+91{phone}</strong>
             </div>
             <input type="text" placeholder="• • • • • •" value={otp} maxLength={6}
               onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              className={otpInp} required />
+              className={otpInp} style={inpStyle} required />
             <button type="submit" disabled={busy} className={btn}>
               {busy && <Loader2 size={16} className="animate-spin" />}
               {busy ? 'Creating account...' : 'Verify & Create Account'}
             </button>
             <OTPResend />
             <button type="button" onClick={() => { setMode('register'); setOtp('') }}
-              className="flex items-center gap-1 text-sm text-[#64748b] hover:text-[#1e293b] mx-auto">
+              className="flex items-center gap-1 text-sm mx-auto transition-colors hover:text-[#00C8FF]"
+              style={{ color: 'rgba(255,255,255,0.5)' }}>
               <ArrowLeft size={14} /> Back
             </button>
           </form>
         )}
 
         {!isSupabaseReady && (
-          <div className="mt-4 bg-red-50 border border-red-200 rounded-xl p-3 text-xs text-red-600">
+          <div className="mt-4 rounded-xl p-3 text-xs" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#f87171' }}>
             Supabase not configured. Update VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env
           </div>
         )}
-        <p className="text-center text-xs text-[#94a3b8] mt-5">
+        <p className="text-center text-xs mt-5" style={{ color: 'rgba(255,255,255,0.3)' }}>
           By signing in, you agree to our Terms of Service and Privacy Policy.
         </p>
       </div>

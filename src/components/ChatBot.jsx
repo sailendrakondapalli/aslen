@@ -144,9 +144,9 @@ export default function ChatBot() {
         <div className="fixed bottom-24 right-4 sm:right-6 z-50 w-[calc(100vw-2rem)] sm:w-96 flex flex-col rounded-2xl shadow-2xl overflow-hidden"
           style={{ maxHeight: '70vh', fontFamily: 'Poppins, sans-serif', background: '#fff', border: '1px solid #e2e8f0' }}>
 
-          <div className="flex items-center justify-between px-4 py-3 shrink-0" style={{ background: '#222222' }}>
+          <div className="flex items-center justify-between px-4 py-3 shrink-0" style={{ background: '#0B1B40' }}>
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-[#f59e0b] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-[#3B72C8] flex items-center justify-center">
                 <Bot size={16} className="text-white" />
               </div>
               <div>
@@ -167,12 +167,12 @@ export default function ChatBot() {
               return (
                 <div key={i} className={'flex gap-2 ' + (m.role === 'user' ? 'justify-end' : 'justify-start')}>
                   {m.role === 'assistant' && (
-                    <div className="w-7 h-7 rounded-full bg-[#222222] flex items-center justify-center shrink-0 mt-0.5">
+                    <div className="w-7 h-7 rounded-full bg-[#0B1B40] flex items-center justify-center shrink-0 mt-0.5">
                       <Bot size={13} className="text-white" />
                     </div>
                   )}
                   <div className={'max-w-[80%] px-3 py-2 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ' +
-                    (m.role === 'user' ? 'bg-[#222222] text-white rounded-tr-sm' : 'bg-white text-[#1e293b] rounded-tl-sm border border-[#e2e8f0]')}>
+                    (m.role === 'user' ? 'bg-[#0B1B40] text-white rounded-tr-sm' : 'bg-white text-[#1e293b] rounded-tl-sm border border-[#d0daf5]')}>
                     {m.content}
                   </div>
                   {m.role === 'user' && (
@@ -185,13 +185,13 @@ export default function ChatBot() {
             })}
             {loading && (
               <div className="flex gap-2 justify-start">
-                <div className="w-7 h-7 rounded-full bg-[#222222] flex items-center justify-center shrink-0">
+                <div className="w-7 h-7 rounded-full bg-[#0B1B40] flex items-center justify-center shrink-0 mt-0.5">
                   <Bot size={13} className="text-white" />
                 </div>
-                <div className="bg-white border border-[#e2e8f0] rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#222222] animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#222222] animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#222222] animate-bounce" style={{ animationDelay: '300ms' }} />
+                <div className="bg-white border border-[#d0daf5] rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#0B1B40] animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#0B1B40] animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#0B1B40] animate-bounce" style={{ animationDelay: '300ms' }} />
                 </div>
               </div>
             )}
@@ -203,7 +203,7 @@ export default function ChatBot() {
               {QUICK_REPLIES.map(function(q) {
                 return (
                   <button key={q} onClick={function() { sendMessage(q) }}
-                    className="text-xs px-3 py-1.5 rounded-full border border-[#e2e8f0] bg-white text-[#222222] hover:bg-[#222222] hover:text-white transition-colors">
+                    className="text-xs px-3 py-1.5 rounded-full border border-[#d0daf5] bg-white text-[#0B1B40] hover:bg-[#0B1B40] hover:text-white transition-colors">
                     {q}
                   </button>
                 )
@@ -218,7 +218,7 @@ export default function ChatBot() {
               className="flex-1 text-sm border border-[#e2e8f0] rounded-xl px-3 py-2 text-[#1e293b] placeholder-[#94a3b8] outline-none"
               disabled={loading} />
             <button onClick={function() { sendMessage() }} disabled={!input.trim() || loading}
-              className="w-9 h-9 rounded-xl bg-[#222222] hover:bg-[#111111] text-white flex items-center justify-center transition-colors disabled:opacity-40 shrink-0">
+              className="w-9 h-9 rounded-xl bg-[#0B1B40] hover:bg-[#060e22] text-white flex items-center justify-center transition-colors disabled:opacity-40 shrink-0">
               <Send size={15} />
             </button>
           </div>
@@ -227,9 +227,9 @@ export default function ChatBot() {
 
       <button onClick={function() { setOpen(function(o) { return !o }) }}
         className="fixed bottom-5 right-4 sm:right-6 z-50 w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-all hover:scale-110"
-        style={{ background: '#222222' }} aria-label="Chat with ASLEN AI">
+        style={{ background: '#0B1B40' }} aria-label="Chat with ASLEN AI">
         {open ? <X size={22} className="text-white" /> : <MessageCircle size={22} className="text-white" />}
-        {!open && <span className="absolute top-0 right-0 w-3.5 h-3.5 bg-[#f59e0b] rounded-full border-2 border-white" />}
+        {!open && <span className="absolute top-0 right-0 w-3.5 h-3.5 bg-[#3B72C8] rounded-full border-2 border-white" />}
       </button>
     </>
   )

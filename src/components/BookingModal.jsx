@@ -93,7 +93,7 @@ export default function BookingModal({ service, onClose }) {
       description: `${service.serviceTitle} - ${service.name} (Advance)`,
       image: '/logo.png',
       prefill: { name: user.user_metadata?.full_name || '', email: user.email, contact: '' },
-      theme: { color: '#222222' },
+      theme: { color: '#0B1B40' },
       handler: async (response) => {
         try {
           const booking = await saveBooking(response.razorpay_payment_id, method || 'razorpay')
@@ -119,25 +119,25 @@ export default function BookingModal({ service, onClose }) {
   const renderDetails = () => (
     <>
       <div className="p-6 space-y-4">
-        <div className="bg-[#f5f5f5] rounded-xl p-4 space-y-1">
+        <div className="bg-[#eef2fb] rounded-xl p-4 space-y-1">
           <p className="text-xs text-[#94a3b8] uppercase tracking-wide font-medium">Service</p>
           <p className="font-bold text-[#1e293b]">{service.serviceTitle}</p>
           <p className="text-sm text-[#64748b]">{service.name}</p>
         </div>
 
         {!isCustom && (
-          <div className="bg-[#f5f5f5] rounded-xl p-4 space-y-2">
+          <div className="bg-[#eef2fb] rounded-xl p-4 space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-[#64748b]">Total Price</span>
               <span className="font-bold text-[#1e293b]">₹{totalPrice.toLocaleString()}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-[#64748b]">Advance (pay now)</span>
-              <span className="font-bold text-[#d97706]">₹{advanceAmount.toLocaleString()}</span>
+              <span className="font-bold text-[#2a5aaa]">₹{advanceAmount.toLocaleString()}</span>
             </div>
-            <div className="flex justify-between text-sm border-t border-[#e2e8f0] pt-2">
+            <div className="flex justify-between text-sm border-t border-[#d0daf5] pt-2">
               <span className="text-[#64748b]">Remaining (after delivery)</span>
-              <span className="font-semibold text-[#222222]">₹{(totalPrice - advanceAmount).toLocaleString()}</span>
+              <span className="font-semibold text-[#0B1B40]">₹{(totalPrice - advanceAmount).toLocaleString()}</span>
             </div>
           </div>
         )}
@@ -147,11 +147,11 @@ export default function BookingModal({ service, onClose }) {
             <label className="block text-sm font-semibold text-[#1e293b] mb-2">Extra Pages (beyond 5)</label>
             <div className="flex items-center gap-3">
               <button onClick={() => setExtraPages(Math.max(0, extraPages - 1))}
-                className="w-9 h-9 rounded-lg border border-[#e2e8f0] flex items-center justify-center text-lg font-bold hover:bg-[#f5f5f5] text-[#222222]">−</button>
+                className="w-9 h-9 rounded-lg border border-[#d0daf5] flex items-center justify-center text-lg font-bold hover:bg-[#eef2fb] text-[#0B1B40]">−</button>
               <span className="text-lg font-bold w-8 text-center text-[#1e293b]">{extraPages}</span>
               <button onClick={() => setExtraPages(extraPages + 1)}
-                className="w-9 h-9 rounded-lg border border-[#e2e8f0] flex items-center justify-center text-lg font-bold hover:bg-[#f5f5f5] text-[#222222]">+</button>
-              {extraPages > 0 && <span className="text-sm text-[#d97706] font-medium">+₹{extraCost.toLocaleString()}</span>}
+                className="w-9 h-9 rounded-lg border border-[#d0daf5] flex items-center justify-center text-lg font-bold hover:bg-[#eef2fb] text-[#0B1B40]">+</button>
+              {extraPages > 0 && <span className="text-sm text-[#2a5aaa] font-medium">+₹{extraCost.toLocaleString()}</span>}
             </div>
           </div>
         )}
@@ -166,7 +166,7 @@ export default function BookingModal({ service, onClose }) {
         </div>
 
         {!isCustom && (
-          <div className="bg-[#f5f5f5] rounded-xl p-3 text-xs text-[#222222] flex items-center gap-2">
+          <div className="bg-[#eef2fb] rounded-xl p-3 text-xs text-[#0B1B40] flex items-center gap-2">
             <CheckCircle size={13} className="shrink-0" />
             Only ₹{advanceAmount.toLocaleString()} advance now. Remaining ₹{(totalPrice - advanceAmount).toLocaleString()} after delivery.
           </div>
@@ -175,17 +175,17 @@ export default function BookingModal({ service, onClose }) {
 
       <div className="p-6 pt-0 flex gap-3">
         <button onClick={onClose}
-          className="flex-1 border border-[#e2e8f0] text-[#64748b] py-3 rounded-xl font-semibold hover:bg-[#f5f5f5] transition-colors">
+          className="flex-1 border border-[#d0daf5] text-[#64748b] py-3 rounded-xl font-semibold hover:bg-[#eef2fb] transition-colors">
           Cancel
         </button>
         {isCustom ? (
           <button onClick={sendWhatsAppEnquiry}
-            className="flex-1 bg-[#222222] hover:bg-[#111111] text-white py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2">
+            className="flex-1 bg-[#0B1B40] hover:bg-[#060e22] text-white py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2">
             <MessageCircle size={18} /> WhatsApp Us
           </button>
         ) : (
           <button onClick={() => setStep(STEP_PAYMENT)}
-            className="flex-1 bg-[#222222] hover:bg-[#111111] text-white py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2">
+            className="flex-1 bg-[#0B1B40] hover:bg-[#060e22] text-white py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2">
             Continue to Payment →
           </button>
         )}
@@ -196,9 +196,9 @@ export default function BookingModal({ service, onClose }) {
   const renderPayment = () => (
     <>
       <div className="p-6 space-y-4">
-        <div className="bg-[#f5f5f5] rounded-xl p-4 text-center">
+        <div className="bg-[#eef2fb] rounded-xl p-4 text-center">
           <p className="text-sm text-[#64748b]">Advance to pay now</p>
-          <p className="text-3xl font-black text-[#222222] mt-1">₹{advanceAmount.toLocaleString()}</p>
+          <p className="text-3xl font-black text-[#0B1B40] mt-1">₹{advanceAmount.toLocaleString()}</p>
           <p className="text-xs text-[#94a3b8] mt-1">Secure payment via Razorpay</p>
         </div>
 
@@ -213,7 +213,7 @@ export default function BookingModal({ service, onClose }) {
             { id: 'emi',        label: 'EMI',                 sub: 'No-cost EMI on select cards', emoji: '📅' },
           ].map(({ id, label, sub, emoji }) => (
             <button key={id} onClick={() => handleRazorpayPayment(id)} disabled={loading}
-              className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-[#e2e8f0] hover:border-[#222222] hover:bg-[#f5f5f5] transition-all text-left disabled:opacity-60">
+              className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-[#d0daf5] hover:border-[#0B1B40] hover:bg-[#eef2fb] transition-all text-left disabled:opacity-60">
               <span className="text-2xl w-10 text-center">{emoji}</span>
               <div className="flex-1">
                 <p className="font-semibold text-sm text-[#1e293b]">{label}</p>
@@ -225,20 +225,20 @@ export default function BookingModal({ service, onClose }) {
         </div>
 
         <button onClick={() => handleRazorpayPayment()} disabled={loading}
-          className="w-full bg-[#222222] hover:bg-[#111111] text-white py-3 rounded-xl font-bold transition-colors disabled:opacity-60 flex items-center justify-center gap-2 text-sm">
+          className="w-full bg-[#0B1B40] hover:bg-[#060e22] text-white py-3 rounded-xl font-bold transition-colors disabled:opacity-60 flex items-center justify-center gap-2 text-sm">
           {loading ? <Loader2 size={16} className="animate-spin" /> : null}
           {loading ? 'Loading...' : 'Open All Payment Options'}
         </button>
 
-        <div className="flex items-center gap-2 bg-[#f5f5f5] rounded-xl p-3">
-          <CheckCircle size={14} className="text-[#222222] shrink-0" />
-          <p className="text-xs text-[#222222]">100% secure · SSL encrypted · Powered by Razorpay</p>
+        <div className="flex items-center gap-2 bg-[#eef2fb] rounded-xl p-3">
+          <CheckCircle size={14} className="text-[#0B1B40] shrink-0" />
+          <p className="text-xs text-[#0B1B40]">100% secure · SSL encrypted · Powered by Razorpay</p>
         </div>
       </div>
 
       <div className="p-6 pt-0">
         <button onClick={() => setStep(STEP_DETAILS)}
-          className="flex items-center gap-1 border border-[#e2e8f0] text-[#64748b] px-4 py-2.5 rounded-xl font-semibold hover:bg-[#f5f5f5] transition-colors text-sm">
+          className="flex items-center gap-1 border border-[#d0daf5] text-[#64748b] px-4 py-2.5 rounded-xl font-semibold hover:bg-[#eef2fb] transition-colors text-sm">
           <ArrowLeft size={16} /> Back
         </button>
       </div>
@@ -257,14 +257,14 @@ export default function BookingModal({ service, onClose }) {
               <div className="flex gap-1 mt-1">
                 {[STEP_DETAILS, STEP_PAYMENT].map((s, i) => (
                   <div key={s} className={`h-1 rounded-full transition-all ${
-                    step === s ? 'w-6 bg-[#222222]' :
-                    [STEP_DETAILS, STEP_PAYMENT].indexOf(step) > i ? 'w-4 bg-[#222222]/40' : 'w-4 bg-[#e2e8f0]'
+                    step === s ? 'w-6 bg-[#0B1B40]' :
+                    [STEP_DETAILS, STEP_PAYMENT].indexOf(step) > i ? 'w-4 bg-[#0B1B40]/40' : 'w-4 bg-[#d0daf5]'
                   }`} />
                 ))}
               </div>
             )}
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-[#f5f5f5] rounded-lg transition-colors text-[#64748b]">
+          <button onClick={onClose} className="p-2 hover:bg-[#eef2fb] rounded-lg transition-colors text-[#64748b]">
             <X size={20} />
           </button>
         </div>

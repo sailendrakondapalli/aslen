@@ -7,15 +7,18 @@ export function useScrollReveal() {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add('visible')
+            observer.unobserve(entry.target)
           }
         })
       },
-      { threshold: 0.08, rootMargin: '0px 0px -20px 0px' }
+      { threshold: 0.12 }
     )
 
     // Small delay ensures React has fully painted the DOM
     const timer = setTimeout(() => {
-      const elements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right')
+      const elements = document.querySelectorAll(
+        '.reveal, .reveal-left, .reveal-right, .stagger-children'
+      )
       elements.forEach((el) => observer.observe(el))
     }, 50)
 
