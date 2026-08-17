@@ -575,3 +575,21 @@ input:focus, textarea:focus, select:focus {
 .hide-scrollbar::-webkit-scrollbar {
   display: none;  /* Chrome, Safari and Opera */
 }
+
+/* Infinite auto-scroll animation */
+@keyframes infiniteScroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.infinite-scroll {
+  animation: infiniteScroll 20s linear infinite;
+}
+
+.infinite-scroll:hover {
+  animation-play-state: paused;
+}

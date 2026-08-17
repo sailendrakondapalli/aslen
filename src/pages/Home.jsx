@@ -229,22 +229,27 @@ export default function Home() {
             </p>
           </div>
           
-          {/* Horizontal Scrolling Carousel */}
-          <div className="relative">
-            <div className="overflow-x-auto hide-scrollbar pb-4" style={{ scrollBehavior: 'smooth' }}>
-              <div className="flex gap-6 min-w-max px-2">
-                {PROJECTS.map((site) => (
-                  <div key={site.url} className="w-[320px] flex-shrink-0">
-                    <ProjectCard site={site} />
-                  </div>
-                ))}
-              </div>
+          {/* Infinite Scrolling Carousel */}
+          <div className="relative overflow-hidden">
+            <div className="flex gap-6 infinite-scroll">
+              {/* First set of projects */}
+              {PROJECTS.map((site, index) => (
+                <div key={`first-${site.url}-${index}`} className="w-[320px] flex-shrink-0">
+                  <ProjectCard site={site} />
+                </div>
+              ))}
+              {/* Duplicate set for seamless loop */}
+              {PROJECTS.map((site, index) => (
+                <div key={`second-${site.url}-${index}`} className="w-[320px] flex-shrink-0">
+                  <ProjectCard site={site} />
+                </div>
+              ))}
             </div>
             
             {/* Gradient fade edges */}
-            <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16" 
+            <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 z-10" 
               style={{ background: 'linear-gradient(to right, #080E1C, transparent)' }} />
-            <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16" 
+            <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 z-10" 
               style={{ background: 'linear-gradient(to left, #080E1C, transparent)' }} />
           </div>
           
