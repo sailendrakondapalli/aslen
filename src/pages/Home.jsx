@@ -8,10 +8,18 @@ import { useScrollReveal } from '../hooks/useScrollReveal'
 import toast from 'react-hot-toast'
 
 const PROJECTS = [
-  { name: 'WedFeast', url: 'https://www.wedfeast.in', desc: 'Wedding catering & feast services', tag: 'Food & Events' },
-  { name: 'Saravana Travel', url: 'https://www.saravanatravel.in', desc: 'Tour & travel booking platform', tag: 'Travel' },
-  { name: 'Modak Beauty Parlour', url: 'https://www.modaknaturalbeautyparlour.in', desc: 'Natural beauty parlour services', tag: 'Beauty & Wellness' },
-  { name: 'Kerala Memory Travels', url: 'https://www.keralamemorytravels.in', desc: 'Kerala tourism & travel packages', tag: 'Travel' },
+  // E-Commerce Sites
+  { name: 'Lakshmi Ram Collections', url: 'https://www.lakshmiramcollections.in/', desc: 'Premium fashion & collections', tag: 'E-Commerce', category: 'ecommerce' },
+  { name: 'Nashe Jewels', url: 'https://www.nashejewels.in/', desc: 'Exquisite jewelry collection', tag: 'E-Commerce', category: 'ecommerce' },
+  { name: 'Rudraksha Divines', url: 'https://www.rudrakshadivines.com/', desc: 'Spiritual & divine products', tag: 'E-Commerce', category: 'ecommerce' },
+  
+  // Static/Service Websites
+  { name: 'Kerala Memory Travels', url: 'https://www.keralamemorytravels.in/', desc: 'Kerala tourism & travel packages', tag: 'Travel', category: 'static' },
+  { name: 'Saravana Travel', url: 'https://www.saravanatravel.in/', desc: 'Tour & travel booking platform', tag: 'Travel', category: 'static' },
+  { name: 'WedFeast', url: 'https://www.wedfeast.in/', desc: 'Wedding catering & feast services', tag: 'Food & Events', category: 'static' },
+  { name: 'Modak Beauty Parlour', url: 'https://www.modaknaturalbeautyparlour.in/', desc: 'Natural beauty parlour services', tag: 'Beauty & Wellness', category: 'static' },
+  { name: 'Rishika Pro Makeup Academy', url: 'https://www.rishikapromakeupacademy.beauty/', desc: 'Professional makeup training', tag: 'Beauty & Education', category: 'static' },
+  { name: 'Neurotherapy India', url: 'https://www.neurotherapyindia.website/', desc: 'Neurotherapy & wellness services', tag: 'Healthcare', category: 'static' },
 ]
 
 function useCountUp(target, duration = 1800, start = false) {
@@ -220,10 +228,30 @@ export default function Home() {
               Real websites we built and delivered for our clients
             </p>
           </div>
-          <div className="stagger-children grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {PROJECTS.map((site) => (
-              <ProjectCard key={site.url} site={site} />
-            ))}
+          
+          {/* Horizontal Scrolling Carousel */}
+          <div className="relative">
+            <div className="overflow-x-auto hide-scrollbar pb-4" style={{ scrollBehavior: 'smooth' }}>
+              <div className="flex gap-6 min-w-max px-2">
+                {PROJECTS.map((site) => (
+                  <div key={site.url} className="w-[320px] flex-shrink-0">
+                    <ProjectCard site={site} />
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Gradient fade edges */}
+            <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16" 
+              style={{ background: 'linear-gradient(to right, #080E1C, transparent)' }} />
+            <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16" 
+              style={{ background: 'linear-gradient(to left, #080E1C, transparent)' }} />
+          </div>
+          
+          <div className="text-center mt-8">
+            <p className="text-sm font-semibold" style={{ color: 'rgba(0,200,255,0.7)' }}>
+              And Many More Sites We Built! 🚀
+            </p>
           </div>
         </div>
       </section>

@@ -566,3 +566,12 @@ input:focus, textarea:focus, select:focus {
   animation-delay: 0.3s;
   width: 0%;
 }
+
+/* ── Horizontal Scroll (Projects Carousel) ──────────────────────────────── */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
